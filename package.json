@@ -1,0 +1,25 @@
+{
+  "name": "love-bot",
+  "version": "1.0.0",
+  "main": "server.js",
+  "license": "MIT",
+  "scripts": {
+    "copy-files": "cp -r ./src/i18n/ ./dist/",
+    "build": "yarn tsc && yarn copy-files",
+    "dev": "yarn tsc && yarn copy-files && node dist/run.js",
+    "deploy": "yarn tsc && yarn copy-files && deta deploy"
+  },
+  "dependencies": {
+    "grammy": "^1.20.3",
+    "@grammyjs/storage-free": "^2.4.1",
+    "@grammyjs/transformer-throttler": "^1.2.1",
+    "@grammyjs/router": "^2.0.0",
+    "@grammyjs/fluent": "^1.0.3",
+    "@moebius/fluent": "^1.1.0",
+    "axios": "^1.6.5"
+    
+  },
+  "devDependencies": {
+    "typescript": "^4.7.2"
+  }
+}

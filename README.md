@@ -1,0 +1,61 @@
+# Deno GrammY Starter Bot
+
+## Starter template for Grammy Bots on Deno Deploy 
+
+This Telegram Bot is a typescript starter template Bot developed under Grammyjs Framework and deployed on Deno Deploy.
+It is free of charge and to clone for your own use (see LICENSE file). 
+
+## Test the bot
+
+1. Open your Telegram application and search for `@DenoGrammyStarter_bot` 
+2. Initialize it with `/start`
+3. You have to accept the 'Charter' with the `/charte` command to start using it. The only purpose of this 'Charter' is to show the principles of implementing and using a custom middleware (here `hasSignedCharter.ts`)
+4. Once 'Charter' is accepted, you can create and manage a simple profile with the `/profil` command.
+
+## Clone 'Deno GrammY Starter Bot'
+
+1. Clone the `'Deno GrammY Starter Bot'` template form GitHub
+
+2. Create a new `<YOUR_DENO_PROJECT>` project on Deno Deploy.
+3. Set the `BOT_TOKEN` variable to your token (this can be done in the project’s settings).
+4. Set your bot’s webhook URL to `https://<PROJECT_NAME>.deno.dev/<BOT_TOKEN>` (replacing `<...>` with respective values). To do that, you can open the request URL in your browser:
+
+`https://api.telegram.org/bot<BOT_TOKEN>/setWebhook?url=https://<PROJECT_NAME>.deno.dev/<BOT_TOKEN>`
+
+## Customize Deno Deploy
+
+You have to customize `deploy` and `deployPROD` tasks in deno.json file and change the `--project` setting to `<YOUR_DENO_PROJECT>`.
+
+
+## Environment variables
+
+You have to set-up theses environements variables before deploying / running your Bot.
+`export BOT_NAME='<YOUR_BOT_NAME>'`
+`export BOT_TOKEN="<YOUR_BOT_TOKEN>"`
+`export BOT_ADMIN=<COMMA_SEPARATED_LIST_OF_TELEGRAM_USER.ID>`
+
+## Config variables
+
+You have to customize theses config variables before deploying / running your Bot.
+`export const VERSION = "<VERSION>"`
+`export const VERSION_DATE = "<VERSION_DATE>"`
+`export const BOT_USERNAME = "<YOUR_BOT_USERNAME>";`
+`export const DEV_USERNAME = "<YOUR_USERNAME>"`
+
+## Deploying with GitHub (easy)
+
+1. Push your project to a GitHub repository.
+2. Set up GitHub Integration in the project’s settings. Select `server.ts` as the entry point.
+3. You’re done! New versions will be automatically deployed on push.
+
+## Deploying with deployctl (advanced)
+
+1. Install `deployctl`.
+2. Create a new access token. Save it somewhere.
+3. Run this command to deploy: 
+
+`deployctl deploy --project <PROJECT_NAME> ./server.ts --prod --token <ACCESS_TOKEN>`
+
+## Running the bot locally
+
+Use `poll.ts` to run the bot locally for development. Note that it will delete the webhook URL, and you’ll need to repeat the 3rd step to be able to run the bot on Deno Deploy.

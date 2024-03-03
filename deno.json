@@ -1,0 +1,78 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": [
+      "deno.window"
+    ],
+    "strict": true
+  },
+  "lint": {
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/",
+      "data/fixtures/**/*.ts"
+    ],
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "ban-untagged-todo"
+      ],
+      "exclude": [
+        "no-unused-vars"
+      ]
+    }
+  },
+  "fmt": {
+    "useTabs": true,
+    "lineWidth": 80,
+    "indentWidth": 4,
+    "semiColons": false,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/",
+      "data/fixtures/**/*.ts"
+    ]
+  },
+  "lock": false,
+  "nodeModulesDir": true,
+  "unstable": [
+    "webgpu"
+  ],
+  "npmRegistry": "https://mycompany.net/artifactory/api/npm/virtual-npm",
+  "test": {
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/",
+      "data/fixtures/**/*.ts"
+    ]
+  },
+  "tasks": {
+    "run": "deno run --allow-read --allow-write --allow-net --allow-env --unstable --watch src/poll.ts",
+    "deploy": "deployctl deploy --project=deno-grammy-starter-bot --save-config src/server.ts",
+    "deployPROD": "deployctl deploy --project=deno-grammy-starter-bot --prod --save-config src/server.ts"
+  },
+  "imports": {
+    "http-server": "https://deno.land/std@0.217.0/http/server.ts",
+    "denokv": "https://deno.land/x/grammy_storages/denokv/src/mod.ts",
+    "crypto": "https://deno.land/std@0.97.0/node/crypto.ts",
+    "types-manage": "https://deno.land/x/grammy_types@v3.5.2/manage.ts"
+  },
+  "deploy": {
+    "project": "fb2c717e-eff1-4cf7-af59-eefe4b6f8492",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": [],
+    "entrypoint": "src/server.ts"
+  }
+}
