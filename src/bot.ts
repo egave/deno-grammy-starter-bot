@@ -1,13 +1,12 @@
 import { Bot, session, MaybePromise, GrammyError, HttpError } from 'npm:grammy'
 import { apiThrottler } from 'npm:@grammyjs/transformer-throttler'
-import { freeStorage } from "npm:@grammyjs/storage-free";
+import path from 'node:path';
 import { DenoKVAdapter } from "denokv";
 import {
   conversations,
   createConversation,
 } from "npm:@grammyjs/conversations";
-import { useFluent } from "npm:@grammyjs/fluent";
-import { fluent } from './helpers/i18n.ts'
+import { I18n } from "i18n";
 import kv from './db/db.ts' 
 import { initSessionData } from './types/sessionData.ts';
 import type { CustomContext } from './types/customContext.ts'
@@ -16,6 +15,7 @@ import { composer } from './composers/index.ts'
 import { doBaseProfile, deleteProfile,
           doPhotoProfile, deletePhotoProfile } from './conversations/profileConversation.ts'
 
+const __dirname = path.resolve();
 
 function getSessionKey(ctx: Omit<CustomContext, 'session'>): MaybePromise<string | undefined> {
   // Give every user their personal session storage
@@ -27,11 +27,19 @@ function getSessionKey(ctx: Omit<CustomContext, 'session'>): MaybePromise<string
 console.debug('Creating bot...');
 export const bot = new Bot<CustomContext>(Deno.env.get("BOT_TOKEN") || '')
 
-// 2. Attach fluent plugin for internalization
-console.debug('Attaching fluent...');
-bot.use(useFluent({
-  fluent,
-}));
+// 2. Attach I18n plugin for internalization
+// Create an `I18n` instance.
+export const i18n = new I18n<CustomContext>({
+  defaultLocale: "fr", // see below for more information
+});
+
+// Translation files loaded this way works in Deno Deploy, too.
+await i18n.loadLocalesDir(`${__dirname}/src/ressources/locales`);
+
+// Register the i18n instance in the bot,
+// so the messages get translated on their way!
+console.debug('Attaching I18n...');
+bot.use(i18n);
 
 // 3. Attach an api throttler transformer to the bot
 console.debug('Attaching api throttlet...');

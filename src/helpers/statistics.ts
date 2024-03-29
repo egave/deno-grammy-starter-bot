@@ -1,5 +1,5 @@
 import kv from '../db/db.ts'
-import { fluent } from '../helpers/i18n.ts'
+import { i18n } from '../bot.ts'
 import { Profile, Gender } from '../types/profile.ts'
 
 export async function computeProfileStatistics(): Promise<string> {
@@ -107,21 +107,21 @@ export async function computeProfileStatistics(): Promise<string> {
     const sortedProfilesPerYear = new Map([...profilesPerYear.entries()].sort(([year1], [year2]) => year2 - year1));
 
     // Affichage des valeurs non nulles
-    let message = fluent.translate('fr', 'stat-message', { 
+    let message = i18n.translate('fr', 'stat-message', { 
                                     bot_name: Deno.env.get("BOT_NAME")! }) +  "\n\n";
     if (totalMen > 0) {
         console.debug("Nombre de profils Homme:", totalMen);
-        message += fluent.translate('fr', 'stat-number-men', { number: totalMen }) + "\n";      
+        message += i18n.translate('fr', 'stat-number-men', { number: totalMen }) + "\n";      
     }
     if (totalWomen > 0) {
         console.debug("Nombre de profils Femme:", totalWomen);
-        message += fluent.translate('fr', 'stat-number-women', { number: totalWomen }) + "\n\n";       
+        message += i18n.translate('fr', 'stat-number-women', { number: totalWomen }) + "\n\n";       
     }
 
     for (const [range, number] of Object.entries(ageRanges)) {
         if (number !== 0) {
             console.debug(`Nombre de profils dans la tranche d'âge ${range}:`, number);
-            message += fluent.translate('fr', 'stat-by-age-range', { 
+            message += i18n.translate('fr', 'stat-by-age-range', { 
                 range: range,
                 number: number
             }) + "\n";
@@ -130,13 +130,13 @@ export async function computeProfileStatistics(): Promise<string> {
 
     // Add statistics for new profiles within one week
     console.debug(`Nombre de nouveaux profils enregistrés depuis une semaine: ${newProfilesOneWeek}\n`);
-    message += "\n" + fluent.translate('fr', 'stat-new-profiles-week', { 
+    message += "\n" + i18n.translate('fr', 'stat-new-profiles-week', { 
         number: newProfilesOneWeek
     }) + "\n";
 
     // Add statistics for new profiles within one month
     console.debug(`Nombre de nouveaux profils enregistrés depuis une semaine: ${newProfilesOneMonth}\n`);
-    message += fluent.translate('fr', 'stat-new-profiles-month', { 
+    message += i18n.translate('fr', 'stat-new-profiles-month', { 
         number: newProfilesOneMonth
     }) + "\n";
 

@@ -64,6 +64,7 @@
   "imports": {
     "http-server": "https://deno.land/std@0.217.0/http/server.ts",
     "denokv": "https://deno.land/x/grammy_storages/denokv/src/mod.ts",
+    "i18n": "https://deno.land/x/grammy_i18n@v1.0.2/mod.ts",
     "crypto": "https://deno.land/std@0.97.0/node/crypto.ts",
     "types-manage": "https://deno.land/x/grammy_types@v3.5.2/manage.ts"
   },

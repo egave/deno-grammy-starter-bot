@@ -1,8 +1,8 @@
 # Deno GrammY Starter Bot
 
-## Starter template for Telegram Bots with GrammJS on Deno Deploy 
+## Starter template for Telegram Bots with GrammY on Deno Deploy 
 
-This Telegram Bot is a typescript starter template Bot developed under Grammyjs Framework and deployed on Deno Deploy.
+This Telegram Bot is a typescript starter template Bot developed under [GrammY Framework](https://grammy.dev/) and deployed on [Deno Deploy](https://docs.deno.com/deploy/manual).
 It is free of charge and to clone for your own use (see LICENSE file). 
 
 ## Test the bot
@@ -19,7 +19,7 @@ It is free of charge and to clone for your own use (see LICENSE file).
 `git clone https://github.com/egave/deno-grammy-starter-bot.git` 
 3. Now you have to customize `deploy` and `deployPROD` tasks in deno.json file and change the `--project` setting to `<YOUR_DENO_PROJECT>`.
 
-4. Cerate a new Telegram Bot with `@BotFather`.
+4. Create a new Telegram Bot with `@BotFather`.
 Give-it the `BOT_NAME` and `BOT_YOURNAME` of your choice.
 Keep the `BOT_TOKEN` safe an secret. Do not commit a file with the `BOT_TOKEN` in it.
 5. Set-up environment variables
