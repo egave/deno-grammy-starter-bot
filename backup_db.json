@@ -1,0 +1,51 @@
+[
+  {
+    "key": [
+      "sessions",
+      "1624906464"
+    ],
+    "value": {
+      "charter": {
+        "hasSignedUp": true,
+        "signatureDate": "2024-06-05T08:53:53.979Z"
+      },
+      "profile": {
+        "creationDate": "2024-06-05T08:54:13.485Z",
+        "baseProfile": {
+          "gender": "Man",
+          "age": 51,
+          "postal_code": 94170,
+          "bio": "Ceci est une bio de test",
+          "userId": 1624906464,
+          "username": "Enguerrand94",
+          "firstName": "Engué",
+          "lastName": "14 EGA 94"
+        },
+        "photos": [
+          {
+            "file_id": "AgACAgQAAxkBAAIE-GZ2oeaz4h00NjwaAwLUSOrai4yYAAL6wDEbPzSwU3dWDJ2Aq-7PAQADAgADcwADNQQ",
+            "file_unique_id": "AQAD-sAxGz80sFN4",
+            "file_size": 1435,
+            "width": 90,
+            "height": 60
+          },
+          {
+            "file_id": "AgACAgQAAxkBAAIE-GZ2oeaz4h00NjwaAwLUSOrai4yYAAL6wDEbPzSwU3dWDJ2Aq-7PAQADAgADbQADNQQ",
+            "file_unique_id": "AQAD-sAxGz80sFNy",
+            "file_size": 19891,
+            "width": 320,
+            "height": 213
+          },
+          {
+            "file_id": "AgACAgQAAxkBAAIE-GZ2oeaz4h00NjwaAwLUSOrai4yYAAL6wDEbPzSwU3dWDJ2Aq-7PAQADAgADeAADNQQ",
+            "file_unique_id": "AQAD-sAxGz80sFN9",
+            "file_size": 58248,
+            "width": 612,
+            "height": 408
+          }
+        ]
+      },
+      "hasBeenBlocked": false
+    }
+  }
+]

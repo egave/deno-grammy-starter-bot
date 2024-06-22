@@ -1,6 +1,6 @@
 // https://stackoverflow.com/questions/76937418/conversation-touchs-other-sessions-in-grammy
 
-import { Context } from 'npm:grammy'
+import { Context } from 'grammyjs'
 import { type Conversation } from "npm:@grammyjs/conversations";
 import type { CustomContext } from '../types/customContext.ts'
 import { Gender } from '../types/profile.ts'

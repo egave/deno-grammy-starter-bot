@@ -1,4 +1,4 @@
-import { Composer } from 'npm:grammy'
+import { Composer } from 'grammyjs'
 import type { CustomContext } from '../types/customContext.ts'
 import doStat from '../tasks/doStat.ts'
 import { addDummyData, deleteDummyData } from '../helpers/dummyData.ts'
@@ -13,6 +13,7 @@ import handleHelp from '../commands/handleHelp.ts'
 import handleInfo from '../commands/admin/handleInfo.ts'
 import handleProfile from '../commands/handleProfile.ts'
 import handleDisplay from '../commands/handleDisplay.ts'
+import handleStatusUpdate from './events/handleStatusUpdate.ts'
 import { displayProfile } from '../commands/handleDisplay.ts'
 
 const composer = new Composer<CustomContext>()
@@ -121,9 +122,12 @@ composer.command('dostat', async ctx => {
     console.log(result);
 })
 
+// Manage status updates about your bot (to deal with 'kicked' updates)
+composer.on("my_chat_member", handleStatusUpdate)
+
 composer.on("::bot_command", async (ctx) => {
     console.debug('** other command not found')
-    await ctx.api.sendMessage(ctx.from.id, ctx.t('not-found-message'));
+    await ctx.reply(ctx.t('not-found-message'));
 })
 
 composer.on("callback_query:data", async (ctx: CustomContext) => {

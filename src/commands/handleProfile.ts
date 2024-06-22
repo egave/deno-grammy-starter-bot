@@ -1,4 +1,4 @@
-import { InlineKeyboard } from 'npm:grammy'
+import { InlineKeyboard } from 'grammyjs'
 import { CustomContext } from '../types/customContext.ts'
 
 export default async function handleProfile(ctx: CustomContext) {

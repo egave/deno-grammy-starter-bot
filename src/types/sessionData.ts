@@ -5,6 +5,7 @@ import { Profile, createInitialProfile } from '../types/profile.ts'
 
 interface ISessionData {
     data: {
+        hasBeenBlocked: boolean
         charter: ICharter,
         profile: IProfile | undefined
     }
@@ -12,12 +13,14 @@ interface ISessionData {
 
 class SessionData implements ISessionData {
     data: {
+        hasBeenBlocked: boolean
         charter: Charter,
         profile: Profile | undefined
     }
 
   constructor (_charter: Charter, _profile: Profile | undefined) {
     this.data = {
+        hasBeenBlocked: false,
         charter: _charter,
         profile: _profile
     };
@@ -27,12 +30,20 @@ class SessionData implements ISessionData {
     return this.data;
   }
 
+  getHasBeenBlocked (){
+    return this.data.hasBeenBlocked;
+  }
+
   getCharter (){
     return this.data.charter;
   }
 
   getProfile (){
     return this.data.profile;
+  }
+
+  setHasBeenBlocked (_hasBeenBlocked: boolean){
+    this.data.hasBeenBlocked = _hasBeenBlocked;
   }
 
   setCharter (_charter: Charter){
@@ -46,6 +57,7 @@ class SessionData implements ISessionData {
   static toJSON (_sessionData: SessionData) {
     return {
         data : {
+            hasBeenBlocked: _sessionData.data.hasBeenBlocked,
             charter: _sessionData.data.charter,
             profile: _sessionData.data.profile
             }

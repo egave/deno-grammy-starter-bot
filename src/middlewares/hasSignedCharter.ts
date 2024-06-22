@@ -1,4 +1,4 @@
-import { NextFunction } from 'npm:grammy';
+import { NextFunction } from 'grammyjs';
 import { CustomContext } from '../types/customContext.ts'
 import { initSessionData } from '../types/sessionData.ts';
 import { isAdmin } from '../helpers/isAdmin.ts';

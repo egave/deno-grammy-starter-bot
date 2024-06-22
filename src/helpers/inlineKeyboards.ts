@@ -1,4 +1,4 @@
-import { InlineKeyboard } from 'npm:grammy'
+import { InlineKeyboard } from 'grammyjs'
 import type { CustomContext } from '../types/customContext.ts'
 
 export function inlineCharteKeyboardButtons (ctx: CustomContext): InlineKeyboard {

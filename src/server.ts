@@ -1,12 +1,11 @@
-import { serve } from "http-server";
-import { webhookCallback } from "npm:grammy";
+//import { serve } from "http-server";
+import { webhookCallback } from "grammyjs";
 import { bot } from "./bot.ts";
 import doStat from './tasks/doStat.ts'
 
 
 const handleUpdate = webhookCallback(bot, "std/http");
-
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   if (req.method == "POST") {
     const url = new URL(req.url);
     if (url.pathname.slice(1) == bot.token) {

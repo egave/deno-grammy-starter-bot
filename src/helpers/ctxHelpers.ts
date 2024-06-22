@@ -23,9 +23,11 @@ import { isAdmin } from '../helpers/isAdmin.ts';
     console.debug(">>>>> ctx.conversation");
     console.debug(JSON.stringify(ctx.conversation, null, 2));
 
-    await ctx.reply(JSON.stringify(ctx.session.data?.charter, null, 2) + '\n' +
-    JSON.stringify(ctx.session.data?.profile, null, 2));
-};
+    if (ctx.session)
+        await ctx.reply(JSON.stringify(ctx.session, null, 2));
+    else
+        await ctx.reply("Pas de session enregistrée");
+}
 
 export async function deleteContext(ctx: CustomContext) {
     console.debug("** command /delctx");

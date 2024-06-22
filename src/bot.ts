@@ -1,11 +1,11 @@
-import { Bot, session, MaybePromise, GrammyError, HttpError } from 'npm:grammy'
-import { apiThrottler } from 'npm:@grammyjs/transformer-throttler'
+import { Bot, session, MaybePromise, GrammyError, HttpError } from 'grammyjs';
+import { apiThrottler } from 'grammyThrottler';
 import path from 'node:path';
 import { DenoKVAdapter } from "denokv";
 import {
   conversations,
   createConversation,
-} from "npm:@grammyjs/conversations";
+} from "grammyConversations";
 import { I18n } from "i18n";
 import kv from './db/db.ts' 
 import { initSessionData } from './types/sessionData.ts';

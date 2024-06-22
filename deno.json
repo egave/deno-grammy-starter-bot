@@ -57,15 +57,19 @@
     ]
   },
   "tasks": {
-    "run": "deno run --allow-read --allow-write --allow-net --allow-env --unstable --watch src/poll.ts",
+    "db:dump": "deno run --allow-read --allow-write --allow-env --unstable-kv src/db/db_dump.ts",
+    "db:restore": "deno run --allow-read --allow-env --unstable-kv src/db/db_restore.ts",
+    "db:reset": "deno run --allow-read --allow-env --unstable-kv src/db/db_reset.ts",
+    "run": "export BOT_NAME='Deno Grammy Starter Bot' && export BOT_TOKEN='7066927473:AAGR_8AYg5GMm-2WkQ227tj0iqvBDqYKqKQ' && export BOT_ADMIN=1624906464 && deno run --allow-read --allow-write --allow-net --allow-env --unstable --watch src/poll.ts",
     "deploy": "deployctl deploy --project=deno-grammy-starter-bot --save-config src/server.ts",
     "deployPROD": "deployctl deploy --project=deno-grammy-starter-bot --prod --save-config src/server.ts"
   },
   "imports": {
-    "http-server": "https://deno.land/std@0.217.0/http/server.ts",
+    "grammyjs": "https://deno.land/x/grammy@v1.23.0/mod.ts",
+    "grammyConversations": "https://deno.land/x/grammy_conversations@v1.2.0/mod.ts",
+    "grammyThrottler": "https://lib.deno.dev/x/grammy_transformer_throttler@1/mod.ts",
     "denokv": "https://deno.land/x/grammy_storages/denokv/src/mod.ts",
     "i18n": "https://deno.land/x/grammy_i18n@v1.0.2/mod.ts",
-    "crypto": "https://deno.land/std@0.97.0/node/crypto.ts",
     "types-manage": "https://deno.land/x/grammy_types@v3.5.2/manage.ts"
   },
   "deploy": {
