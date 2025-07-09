@@ -1,6 +1,6 @@
 import kv from '../db/db.ts'
-import  { Gender, Profile } from '../types/profile.ts'
-import type { IProfile, BaseProfile } from '../types/profile.ts'
+import  { Gender, Profile } from '../models/profile.ts'
+import type { IProfile, BaseProfile } from '../models/profile.ts'
 
 const firstNames: string[] = ["Alice", "Bob", "Charlie", "David", "Emma", "Frank", "Grace", "Henry", "Ivy", "Jack"];
 const lastNames: string[] = ["Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor"];

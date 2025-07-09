@@ -1,6 +1,6 @@
 import kv from '../db/db.ts'
 import { i18n } from '../bot.ts'
-import { Profile, Gender } from '../types/profile.ts'
+import { Profile, Gender } from '../models/profile.ts'
 
 export async function computeProfileStatistics(): Promise<string> {
     console.debug('Récupère tous les profils en BDD');

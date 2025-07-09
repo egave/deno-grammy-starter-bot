@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "lib": [
       "deno.window"
     ],
@@ -42,7 +41,7 @@
     ]
   },
   "lock": false,
-  "nodeModulesDir": true,
+  "nodeModulesDir": "auto",
   "unstable": [
     "webgpu"
   ],
@@ -60,17 +59,21 @@
     "db:dump": "deno run --allow-read --allow-write --allow-env --unstable-kv src/db/db_dump.ts",
     "db:restore": "deno run --allow-read --allow-env --unstable-kv src/db/db_restore.ts",
     "db:reset": "deno run --allow-read --allow-env --unstable-kv src/db/db_reset.ts",
-    "run": "export BOT_NAME='Deno Grammy Starter Bot' && export BOT_TOKEN='7066927473:AAGR_8AYg5GMm-2WkQ227tj0iqvBDqYKqKQ' && export BOT_ADMIN=1624906464 && deno run --allow-read --allow-write --allow-net --allow-env --unstable --watch src/poll.ts",
-    "deploy": "deployctl deploy --project=deno-grammy-starter-bot --save-config src/server.ts",
+    "deployDEV": "deployctl deploy --project=dev-deno-grammy-starter-bot --prod --save-config src/server.ts",
+    "deployREC": "deployctl deploy --project=rec-deno-grammy-starter-bot --prod --save-config src/server.ts",
     "deployPROD": "deployctl deploy --project=deno-grammy-starter-bot --prod --save-config src/server.ts"
   },
   "imports": {
-    "grammyjs": "https://deno.land/x/grammy@v1.23.0/mod.ts",
-    "grammyConversations": "https://deno.land/x/grammy_conversations@v1.2.0/mod.ts",
-    "grammyThrottler": "https://lib.deno.dev/x/grammy_transformer_throttler@1/mod.ts",
-    "denokv": "https://deno.land/x/grammy_storages/denokv/src/mod.ts",
-    "i18n": "https://deno.land/x/grammy_i18n@v1.0.2/mod.ts",
-    "types-manage": "https://deno.land/x/grammy_types@v3.5.2/manage.ts"
+    "grammyjs": "https://deno.land/x/grammy@v1.35.0/mod.ts",
+    "grammyConversations": "https://deno.land/x/grammy_conversations@v2.0.1/mod.ts",
+    "grammy-types-manage": "https://deno.land/x/grammy_types@v3.20.0/manage.ts",
+    "grammy-types-message": "https://deno.land/x/grammy_types@v3.20.0/message.ts",
+    "rate-limiter": "https://deno.land/x/grammy_ratelimiter@v1.2.1/mod.ts",
+    "grammyThrottler": "https://deno.land/x/grammy_transformer_throttler@v1.2.1/mod.ts",
+    "i18n": "https://deno.land/x/grammy_i18n@v1.1.0/mod.ts",
+    "denokv": "https://deno.land/x/grammy_storages@v2.5.1/denokv/src/mod.ts",
+    "s3": "https://deno.land/x/s3@0.5.0/mod.ts",
+    "ulid": "jsr:@std/ulid"
   },
   "deploy": {
     "project": "fb2c717e-eff1-4cf7-af59-eefe4b6f8492",

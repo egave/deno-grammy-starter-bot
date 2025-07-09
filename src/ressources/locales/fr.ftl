@@ -6,10 +6,13 @@
 
 -cmd-start = /start
 -cmd-help = /aide
--cmd-charter = /charte
+-cmd-cgu = /cgu
 -cmd-profile = /profil
 -cmd-display = /voir
 -cmd-cancel = /annuler
+-cmd-back = /retour
+-cmd-quit = /quitter
+-cmd-skip = /passer
 
 ## Commands
 
@@ -29,10 +32,11 @@ start =
     *[other] Humm... On ne devrait pas arriver là, il y a un bug.
   }
 
-aide = 
-  Voici les commandes disponibles :
+help = 
+  <blockquote>❓<b> Voici les commandes disponibles :</b></blockquote>
   {-cmd-start} : initialise le Bot et affiche un message de bienvenue & une description du Bot
   {-cmd-help} : affiche ce message d'aide
+  {-cmd-cgu} : permet de lire et acceter/refuser les CGUs
   {-cmd-profile} : permet de créer/modifier/supprimer ton profil
   {-cmd-display} : affiche ton profil
   {-cmd-cancel} : annule une conversation en cours avec le Bot
@@ -84,10 +88,13 @@ btn-no =
   non
 
 btn-accept =
-  J'accepte
+  ✅ J'accepte
 
 btn-refuse =
-  Je refuse
+  ❌ Je refuse
+
+btn-replay-cgu = 
+  Revoir les CGUs
 
 btn-woman = 
   Femme 👩‍🦰
@@ -113,10 +120,52 @@ btn-photo-edit =
 btn-photo-delete =
   Supprimer photo de profil
 
-need-sign-charter =
+btn-bio-add =
+  Écrire une petite bio
+
+btn-bio-edit =
+  Modifier ta bio
+
+month-label-janvier =
+  janvier
+
+month-label-fevrier = 
+  Février
+
+month-label-mars =
+  Mars
+
+month-label-avril = 
+  Avril
+
+month-label-mai = 
+  Mai
+
+month-label-juin =
+  Juin
+
+month-label-juillet =
+  Juillet
+
+month-label-aout = 
+  Août
+
+month-label-septembre =
+  Septembre
+
+month-label-octobre =
+  Octobre
+
+month-label-novembre =
+  Novembre
+
+month-label-decembre =
+  Décembre
+
+need-sign-cgu =
   Pour utiiser ce bot, vous devez accepter sa charte d'utilisation 👉 {-cmd-charter} 
 
-charter-text = 
+cgu-text-0 =
   Cette charte énonce les principes et les engagements à accepter avant d'utiliser notre bot Telegram. Le bot vise à fournir des informations pédagogiques sur la création d'applications de type Bot Telegram.
 
   Le bot est fourni tel quel, sans garantie de bon fonctionnement. Des bugs peuvent survenir, et nous nous efforcerons de les résoudre, mais les corrections immédiates ne sont pas garanties. Vos suggestions pour améliorer le bot sont les bienvenues, mais l'auteur n'est pas responsable des malfaçons du bot. Vous utilisez le bot à vos propres risques et responsabilités.
@@ -127,84 +176,162 @@ charter-text =
 
   Merci pour votre attention et votre compréhension. Nous sommes impatients de vous offrir une expérience enrichissante avec notre bot Telegram.
 
-charter-accepted =
+cgu-accepted =
   Merci pour votre signature ! Vous pouvez maintenant accéder à l'ensemble des fonctionnalités du Bot. 
 
-charter-refused =
+cgu-refused =
   Vous n'avez pas accépté les conditions d'utilisation du Bot.
-  Vous ne pouvez donc pas l'utiliser. 
+  Vous ne pouvez donc pas l'utiliser.
+ 
+cgu-already-accepted =
+  Tu as accepté les Conditions Générales d'Utilisation de <b>{-project-name}</b> le <b>{$date}</b>. ✅
+
+  Il ne te reste plus qu’à créer ton {-cmd-profile}. 🌟
+
+cgu-already-refused =
+  Tu as refusé les Conditions Générales d'Utilisation de <b>{-project-name}</b> le <b>{$date}</b>. ❌
+  
+  Tu peux revoir les CGUs et les accepter pour commencer à utiliser <b>{-project-name}</b>.
+
+cgu-quit =
+  Belle aventure avec {-project-name} !
+
+age-text =
+  {" "}- {$age} ans
 
 profile-view =
+  <blockquote><b>{$title}</b></blockquote>
+
   { $gender ->
-    [Man] <tg-emoji emoji-id="5368324170671202286">🙋‍♂️ </tg-emoji><strong>{$contact}</strong> - <b>{$age}</b> ans
-    [Woman] <tg-emoji emoji-id="5368324170671202286">🙋‍♀️ </tg-emoji><strong>{$contact}</strong> - <b>{$age}</b> ans
-    *[other] <strong>{$contact}</strong> - <b>{$age}</b> ans
+    [Man] <tg-emoji emoji-id="5368324170671202286">🙋‍♂️ </tg-emoji><strong>{$contact}</strong>{$age} 
+    [Woman] <tg-emoji emoji-id="5368324170671202286">🙋‍♀️ </tg-emoji><strong>{$contact}</strong>{$age}
+    *[other]
+      <strong>{$contact}</strong>{$age}
   }
-  Habite à <b>{$postal_code}</b>
-  
-  <u>Biographie :</u>
-  <blockquote><b><i>{$bio}</i></b></blockquote>
+  <blockquote>
+    <i>Membre {-project-name} depuis <b>{$membership}</b></i>
+  </blockquote>
+  {$bio}
 
 profile-create =
   Ton profil n'est pas encore créé.
   Veux-tu le créer maintenant ?
 
 profile-create-no = 
-  Dommage. La femme (ou l'homme) de tes rêves n'attend peut-être que toi ?
+  Dommage. Le {-cmd-profile} est nécessaire pour utiliser l'application.
 
 profile-create-step1 = 
   Es-tu une femme 👩‍🦰 ou un homme 👨🏻 ?
 
-profile-create-step2 = 
+profile-ask-for-decade = 
   {$gender ->
     [Man] Super ! tu es un {-man}
+    Renseigne ta date d'anniversaire.
+    Tu es né dans les années ?...
     [Woman] Super ! tu es une {-woman}
+    Renseigne ta date d'anniversaire.
+    Tu es née dans les années ?...
    *[other] <tg-emoji emoji-id="5368324170671202286">🤔</tg-emoji>, ni Homme ni Femme ?
+    Renseigne ta date d'anniversaire.
+    Tu es né dans les années ?...
   }
-  Quel âge as-tu ?
+
+profile-ask-for-year =
+  Continue... en quelle année exactement ?
+
+profile-ask-for-month =
+  Encore un petit effort... en quel mois ?
+
+profile-ask-for-day =
+  Et pour terminer... quel jour ?
+
+birthday-decade-selected =
+  Décennie choisie >> {$decade}
+
+birthday-year-selected =
+  Année de naissance >> {$year}
+
+birthday-month-selected = 
+  Mois de naissance >> {$month}
+
+birthday-day-selected = 
+  Jour de naissance >> {$day}
+
+birthday-skipped =
+  Tu as passé cette étape 
+
+profile-birthday-skiped =
+  Tu pourras renseigner ta date de naissance plus tard dans tes paramètres si nécessaire en modifiant ton profil.
 
 profile-create-step3 = 
   Quel est ton lieu de résidence (code_postal) ?
 
-profile-create-step4 = 
-  Ecrivez votre bio pour séduire votre futur chéri(e).
+profile-write-bio = 
+  Complète ton profil avec une petite description (ou {-cmd-skip} cette étape)
+
+profile-modify-bio =
+  Saisis ta nouvelle bio (ou {-cmd-skip})
+
+profile-confirm-replace-bio =
+  Es-tu sûr de vouloir mettre à jour ta bio ?
+  Cette opération ne pourra être annulée.
+
+profile-bio-save-OK =
+  Ta bio a bien été enregistrée.
+  Tu peux consulter ou modifier ton profil avec 👉 {-cmd-profile}
+
+profile-bio-save-KO =
+  Erreur dans la sauvegarde de ta bio.
+  Réessaie.
+
+profile-bio-save-canceled =
+  Modification annulée. Ta bio n'a pas été modifiée.
 
 profile-manage =
   Ton profil existe déjà.
   Tu peux voir, modifier, supprimer ton profil,
-  ou détailler ton profil et définir les relations recherchées 
-  en cliquant sur les boutons ci-dessous.
+  ou détailler ton profil en cliquant sur les boutons ci-dessous.
 
 profile-missing-baseProfile =
   Ton profil n'est pas encore créé.
   Tu peux créer ton profil maintenant en utilisant la commande /profil
 
+profile-save-new-OK =
+  Ton profil a bien été enregistré et est visible par les autres utilisateurs de {-project-name}.
+  Envoie {-cmd-help} pour la liste complète des commandes disponibles.
+
 profile-save-OK =
-  Ton profil a bien été enregistré et est visible par les autres membres du groupe.
-  Tu peux consulter ton profil 👉 /voir
-  Ou n'hésite pas à le compléter pour plus de rencontres ! 👉 /profil
+  Ton profil a bien été enregistré et est visible par les autres utilisateurs de {-project-name}.
+  N'hésite pas à le compléter ! 👉 {-cmd-profile}
 
 profile-save-KO =
-  Oups ! Ton profil n'a pas été correctement enregistré.
-
-profile-photo-save-KO =
-  Oups ! Ta photo n'a pas été correctement enregistré.
+  Oups ! Ton profil n'a pas été correctement enregistré. Réessaie.
 
 profile-photo-upload-confirmation =
   Veux-tu charger ta photo de profil maintenant ?
 
 profile-photo-upload-confirmation-yes =
-  Envoie-moi ta photo ! (ou /annuler)
+  Envoie ta photo de profil ! (ou {-cmd-skip} cette étape)
 
 profile-photo-upload-confirmation-no =
-  Dommage, un profil avec photo fait 10x plus de rencontres !
+  Dommage, un profil avec photo inspire 10x plus de confiance !
 
-profile-photo-upload-cancel =
-  Chargement de la photo de profil annulé. 
+profile-bio-confirmation-no =
+  Modification annulée.
 
-profile-photo-received =
+profile-photo-upload-OK =
   Photo reçue 😍 !
-  Tu vas faire chavirer les coeurs !
+
+profile-photo-changed-OK =
+  Photo reçue 😍 !
+  Tu peux consulter ou modifier ton profil avec 👉 {-cmd-profile}
+
+profile-photo-upload-KO =
+  Oups ! Ta photo n'a pas été correctement enregistrée. Réessaie.
+
+profile-photo-upload-error =
+  Oups ! Une erreur est survenue au chargement de la photo.
+  Réessaie.
 
 profile-delete-OK =
   Ton profil a bien été supprimé.
@@ -283,6 +410,22 @@ profile-age-minor-error =
 profile-age-senior-error =
   Tu ne vas pas me faire croire que tu as {$age} ans ! 😱
   Renseigne ton véritable âge (18 à 99 ans)
+
+profile-year-duration-text = 
+  {$years} ans
+
+profile-year-month-duration-text =
+  {$years} ans et {$months} mois
+
+profile-month-duration-text = 
+  {$months} mois
+
+profile-day-duration-text =
+  { $days ->
+    [0] aujourd'hui
+    [1] {$days} jour
+    *[other] {$days} jours
+  }
 
 non-available=
   non défini

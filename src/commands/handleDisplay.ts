@@ -1,5 +1,5 @@
 import handleProfile from './handleProfile.ts'
-import type { Profile } from '../types/profile.ts'
+import type { Profile } from '../models/profile.ts'
 
 export default async function handleDisplay(ctx: CustomContext) {
     console.log('** command /voir');

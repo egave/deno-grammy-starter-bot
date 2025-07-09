@@ -1,4 +1,4 @@
-import { CustomContext } from '../types/customContext.ts'
+import { CustomContext } from '../models/customContext.ts'
 import { inlineCharteKeyboardButtons } from '../helpers/inlineKeyboards.ts'
 
 export default async function handleCharter(ctx: CustomContext) {

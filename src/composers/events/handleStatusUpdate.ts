@@ -1,4 +1,4 @@
-import { CustomContext } from '../../types/customContext.ts'
+import { CustomContext } from '../../models/customContext.ts'
 import { BLOQUED, MEMBER } from '../../config.ts'
 //import { BOT_ADMIN } from '../../helpers/isAdmin.ts'
 

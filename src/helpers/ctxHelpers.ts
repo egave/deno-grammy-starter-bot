@@ -1,5 +1,5 @@
-import { CustomContext } from '../types/customContext.ts'
-import { initSessionData } from '../types/sessionData.ts';
+import { CustomContext } from '../models/customContext.ts'
+import { initSessionData } from '../models/sessionData.ts';
 import { isAdmin } from '../helpers/isAdmin.ts';
 
  export async function logContext(ctx: CustomContext) {

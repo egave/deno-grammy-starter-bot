@@ -1,4 +1,4 @@
-import type { CustomContext } from '../../types/customContext.ts'
+import type { CustomContext } from '../../models/customContext.ts'
 import type { User } from "types-manage"
 import { VERSION, VERSION_DATE } from '../../config.ts'
 import { isAdmin } from '../../helpers/isAdmin.ts';

@@ -5,7 +5,7 @@
  *
  * @example
  * ```bash
- * deno task db:restore backup.json
+ * deno task db:restore backup/backup_kv_liblibcar.json
  * ```
  */
 import kv from "./db.ts";
@@ -14,9 +14,14 @@ interface StoredKvU64 {
   value: string;
 }
 
+// function isStoredKvU64(value: unknown): value is StoredKvU64 {
+//   return (value as StoredKvU64).value !== undefined &&
+//     typeof (value as StoredKvU64).value === "string";
+// }
+
 function isStoredKvU64(value: unknown): value is StoredKvU64 {
-  return (value as StoredKvU64).value !== undefined &&
-    typeof (value as StoredKvU64).value === "string";
+  return value !== null && typeof value === "object" &&
+    "value" in value && typeof (value as StoredKvU64).value === "string";
 }
 
 function reviver(_key: unknown, value: unknown) {

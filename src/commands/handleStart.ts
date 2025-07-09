@@ -1,4 +1,4 @@
-import { CustomContext } from '../types/customContext.ts'
+import { CustomContext } from '../models/customContext.ts'
 
 export default async function handleStart(ctx: CustomContext) {
     console.log('** command /start');
