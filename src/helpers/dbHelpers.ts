@@ -104,7 +104,7 @@ export async function showRecords(ctx: CustomContext, key: (string | number)[], 
         }
 
         const distinctKeysMsg = `<b>Distinct level 1 keys in the database:</b>\n` +
-            Array.from(distinctKeys).map(key => `<b>/lk_${key}</b>`).join("\n");
+            Array.from(distinctKeys).map(key => `<b>/kv_${key}</b>`).join("\n");
 
         await ctx.reply(distinctKeysMsg, { parse_mode: "HTML" });
         return;
@@ -114,11 +114,11 @@ export async function showRecords(ctx: CustomContext, key: (string | number)[], 
 
     let nbr = 0;
     let entriesListMsg = `<b>Entries in the database for key: ${key}</b>\n`;
-    for await (const res of iter) {
-        nbr += 1;
-        //entriesListMsg += `${res.key}: ${JSON.stringify(res.value, null, 2)}\n`;
-        entriesListMsg += `<b>/lk_${res.key.join('_')}</b>\n`;
-        if (showValues) {
+    if (showValues) {
+        for await (const res of iter) {
+            nbr += 1;
+            entriesListMsg += `<b>/kv_${res.key.join('_')}</b>\n`;
+
             const val = await kv.get(res.key);
             if (val.value) {
                 const valueStr = JSON.stringify(val.value, (key, val) =>
@@ -127,6 +127,28 @@ export async function showRecords(ctx: CustomContext, key: (string | number)[], 
                 );
                 entriesListMsg += `${valueStr}\n`;
             }
+        }
+    } else {
+        let entriesArray: string[] = [];
+        const uniqueEntries = new Set<string>(); // Pour suivre les entrées uniques
+
+        for await (const res of iter) {
+            nbr += 1;
+            let entry = "";
+            for (let i = 0; i < key.length; i++) {
+                entry += `${res.key[i]}_`;
+            }
+            entry += `${res.key[key.length]}`;
+            
+            // Ajoute seulement si l'entrée n'existe pas déjà
+            if (!uniqueEntries.has(entry)) {
+                uniqueEntries.add(entry);
+                entriesArray.push(entry);
+            }
+        }
+
+        for (const entry of entriesArray) {
+            entriesListMsg += `<b>/kv_${entry}</b>\n`;
         }
     }
     // If no entries were found, check if the key refers to a single entry

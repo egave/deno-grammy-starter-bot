@@ -5,7 +5,6 @@ import { commandTranslations } from '../config.ts'
 import handleStart from '../commands/handleStart.ts'
 import handleHelp from '../commands/handleHelp.ts'
 import handleProfile from '../commands/handleProfile.ts'
-import handleDisplay from '../commands/handleDisplay.ts'
 import handleStatusUpdate from './events/handleStatusUpdate.ts'
 import handleCGU from '../commands/handleCGU.ts'
 
@@ -20,8 +19,6 @@ composer.command('aide', handleHelp);
 composer.command('cgu', handleCGU);
 
 composer.command('profil', handleProfile);
-
-composer.command('voir', handleDisplay);
 
 composer.command('annuler', async ctx => {
     console.log('** command /annuler');

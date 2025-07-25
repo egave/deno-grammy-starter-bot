@@ -16,10 +16,6 @@ import { isAdmin } from '../helpers/isAdmin.ts';
     console.debug(JSON.stringify(ctx.session, null, 2));
     console.debug(">>>>> ctx.session.data");
     console.debug(JSON.stringify(ctx.session["data"], null, 2));
-    console.debug(">>>>> ctx.session.data.charter");
-    console.debug(JSON.stringify(ctx.session.data?.charter, null, 2));
-    console.debug(">>>>> ctx.session.data.profile");
-    console.debug(JSON.stringify(ctx.session.data?.profile, null, 2));
     console.debug(">>>>> ctx.conversation");
     console.debug(JSON.stringify(ctx.conversation, null, 2));
 

@@ -68,4 +68,4 @@ export async function doDump(s3OrFile: boolean = true): Promise<void> {
   }
 }
 
-//await doDump();
+await doDump(false);

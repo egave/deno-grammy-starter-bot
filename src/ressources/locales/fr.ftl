@@ -8,7 +8,6 @@
 -cmd-help = /aide
 -cmd-cgu = /cgu
 -cmd-profile = /profil
--cmd-display = /voir
 -cmd-cancel = /annuler
 -cmd-back = /retour
 -cmd-quit = /quitter
@@ -27,7 +26,7 @@ start =
     
     [0]  Bienvenu {$name}, sur le {-project-name} ! 👋
     
-    Pour pouvoir utiliser ce bot, il faut d'abord accepter sa charte d'utilisation 👉 {-cmd-charter}
+    Pour pouvoir utiliser ce bot, il faut d'abord accepter sa charte d'utilisation 👉 {-cmd-cgu}
     
     *[other] Humm... On ne devrait pas arriver là, il y a un bug.
   }
@@ -38,7 +37,6 @@ help =
   {-cmd-help} : affiche ce message d'aide
   {-cmd-cgu} : permet de lire et acceter/refuser les CGUs
   {-cmd-profile} : permet de créer/modifier/supprimer ton profil
-  {-cmd-display} : affiche ton profil
   {-cmd-cancel} : annule une conversation en cours avec le Bot
   
 info =
@@ -102,9 +100,6 @@ btn-woman =
 btn-man = 
   Homme 👨🏻 
 
-btn-display =
-  Voir
-
 btn-edit =
   Modifier
 
@@ -163,7 +158,7 @@ month-label-decembre =
   Décembre
 
 need-sign-cgu =
-  Pour utiiser ce bot, vous devez accepter sa charte d'utilisation 👉 {-cmd-charter} 
+  Pour utiiser ce bot, vous devez accepter sa charte d'utilisation 👉 {-cmd-cgu} 
 
 cgu-text-0 =
   Cette charte énonce les principes et les engagements à accepter avant d'utiliser notre bot Telegram. Le bot vise à fournir des informations pédagogiques sur la création d'applications de type Bot Telegram.

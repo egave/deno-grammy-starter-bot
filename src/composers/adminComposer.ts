@@ -20,7 +20,6 @@ adminComposer.command('info', handleInfo);
 adminComposer.command('logctx',logContext);
 
 adminComposer.command('delctx',deleteContext);
-
 adminComposer.command('mig', async ctx => {
     console.log('** command /migratedata');
     const args = ctx.msg.text.split(' ').slice(1);
@@ -37,8 +36,8 @@ adminComposer.command('ls', async ctx => {
     await showSessions(ctx);
 })
 
-adminComposer.command('lk', async ctx => {
-    console.log('** command /listkeys')
+adminComposer.command('kv', async ctx => {
+    console.log('** command /keyvalues')
     const args = ctx.msg.text.split(' ').slice(1);
     // if (args.length < 1) {
     //     await ctx.reply("Missing arguments (string | number)[]");
@@ -155,11 +154,6 @@ adminComposer.command('add', async ctx => {
     await ctx.reply('Dummy data added');
 })
 
-/*
-
-// Manage status updates about your bot (to deal with 'kicked' updates)
-adminComposer.on("my_chat_member", handleStatusUpdate)
-
 adminComposer.on("::bot_command", async (ctx) => {
 
     if (!ctx.msg || !ctx.msg.text) {
@@ -173,7 +167,7 @@ adminComposer.on("::bot_command", async (ctx) => {
     console.log('command: ' + cmd +' with args: ',args);
 
     switch (cmd) {
-        case '/lk': {
+        case '/kv': {
             if (!isAdmin(ctx)) {
                     console.log(`User (${ctx.from!.id}) is not admin, cannot execute the command`);
                     return;
@@ -197,9 +191,9 @@ adminComposer.on("::bot_command", async (ctx) => {
     }
 })
 
-composer.on("::bot_command").use(async (ctx:CustomContext) => {
+adminComposer.on("::bot_command").use(async (ctx:CustomContext) => {
     console.debug(ctx)
     await ctx.reply('Commande non reconnue. Si tu as besoin d\'aide, utilise la commande /aide.')
 })
-*/
+
 export { adminComposer }
