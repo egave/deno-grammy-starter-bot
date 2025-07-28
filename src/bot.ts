@@ -1,23 +1,23 @@
-import { Bot, session, MaybePromise, StorageAdapter, GrammyError, HttpError } from 'grammyjs';
-import { apiThrottler } from 'grammyThrottler';
+import { Bot, session, MaybePromise, StorageAdapter, GrammyError, HttpError } from 'grammyjs'
+import { apiThrottler } from 'grammyThrottler'
 import { limit } from "rate-limiter"
-import { S3Adapter } from './service/s3Storage.ts';
+import { S3Adapter } from './service/s3Storage.ts'
 
-import path from 'node:path';
-import { DenoKVAdapter } from "denokv";
+import path from 'node:path'
+import { DenoKVAdapter } from "denokv"
 import {
   conversations,
   createConversation,
-} from "grammyConversations";
-import { I18n } from "i18n";
-import kv from './db/db.ts';
-import { DEFAULTS, commandTranslations, adminCommands } from './config.ts';
-import { initSessionData } from './models/sessionData.ts';
+} from "grammyConversations"
+import { I18n } from "i18n"
+import kv from './db/db.ts'
+import { DEFAULTS, commandTranslations, adminCommands } from './config.ts'
+import { initSessionData } from './models/sessionData.ts'
 import type { CustomContext } from './models/customContext.ts'
-import { hasSignedCGU } from './middlewares/hasSignedCGU.ts';
-import { onlyAdmin } from './middlewares/onlyAdmin.ts';
-import { checkMaintenance } from './middlewares/checkMaintenance.ts';
-import { exitConv } from './middlewares/exitConv.ts';
+import { hasSignedCGU } from './middlewares/hasSignedCGU.ts'
+import { onlyAdmin } from './middlewares/onlyAdmin.ts'
+import { checkMaintenance } from './middlewares/checkMaintenance.ts'
+import { exitConv } from './middlewares/exitConv.ts'
 import { adminComposer } from './composers/adminComposer.ts'
 import { composer } from './composers/index.ts'
 import { doCGU } from './conversations/cguConversation.ts'
@@ -152,8 +152,8 @@ bot.on("message:entities:bot_command").use(
 
 // 9. Attach all composers to the bot as middleware
 console.debug('Attaching composers...');
-bot.use(adminComposer);
 bot.use(composer);
+bot.use(adminComposer);
 
 //CRASH HANDLER
 bot.catch((err) => {

@@ -44,11 +44,6 @@ composer.command('dostat', async ctx => {
 // Manage status updates about your bot (to deal with 'kicked' updates)
 composer.on("my_chat_member", handleStatusUpdate)
 
-composer.on("::bot_command", async (ctx) => {
-    console.debug('** other command not found')
-    await ctx.reply(ctx.t('not-found-message'));
-})
-
 composer.on("callback_query:data", (ctx: CustomContext) => {
     console.debug("Inside callback_query:data");
     if (!ctx.callbackQuery || !ctx.callbackQuery.data) return;
@@ -63,10 +58,11 @@ composer.on("callback_query:data", (ctx: CustomContext) => {
     }
   });
 
-
+/*
 composer.on("::bot_command").use(async (ctx:CustomContext) => {
     console.debug(ctx)
     await ctx.reply('Commande non reconnue. Si tu as besoin d\'aide, utilise la commande /aide.')
 })
+*/
 
 export { composer }
