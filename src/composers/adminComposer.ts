@@ -1,7 +1,7 @@
 import { Composer } from 'grammyjs'
 import type { CustomContext } from '../models/customContext.ts'
 import { KVKeyNames, KEY_AS_NUMBER } from '../config.ts'
-import { isAdmin } from '../helpers/isAdmin.ts';
+//import { isAdmin } from '../helpers/isAdmin.ts';
 import { addDummyData } from '../helpers/dummyData.ts'
 import { showSessions, showSession,
     deleteSession, deleteRecords,
@@ -154,6 +154,7 @@ adminComposer.command('add', async ctx => {
     await ctx.reply('Dummy data added');
 })
 
+/*
 adminComposer.on("::bot_command", async (ctx) => {
 
     if (!ctx.msg || !ctx.msg.text) {
@@ -185,13 +186,13 @@ adminComposer.on("::bot_command", async (ctx) => {
         }
         break;
         default:
-            console.debug('*** other command not found')
+            console.debug('*** other command not found');
             await ctx.reply(ctx.t('not-found-command'));
             break;
     }
 })
 
-/*
+
 adminComposer.on("::bot_command").use(async (ctx:CustomContext) => {
     console.debug(ctx)
     await ctx.reply('Commande non reconnue. Si tu as besoin d\'aide, utilise la commande /aide.')

@@ -3,6 +3,7 @@ import { webhookCallback } from "grammyjs";
 import { bot } from "./bot.ts";
 import { doDump } from "./db/db_dump.ts";
 import doStat from './tasks/doStat.ts'
+import { isNullOrUndefined } from 'node:util'
 
 
 const handleUpdate = webhookCallback(bot, "std/http");
@@ -31,25 +32,30 @@ Deno.serve({ port: 8000 }, async (req: Request) => {
   return new Response("Méthode ou chemin non supporté", { status: 405 });
 });
 
-
-Deno.cron("doJob - Run every saturday at 19", "0 19 * * 6", () => {
-     async function main() {
+const environment = Deno.env.get("ENVIRONMENT");
+if (environment && environment !== "local") {
+  Deno.cron("doJob - Run every saturday at 19", "0 19 * * 6", () => {
+    async function main() {
         const start = Date.now();
-    const result:string = await doStat();
-    console.log(`Executed CRON doStat() in ...${Date.now() - start}ms`)
-    
-    return result
-  }
-  main()
-});
+      const result:string = await doStat();
+      console.log(`Executed CRON doStat() in ...${Date.now() - start}ms`)
+      
+      return result
+    }
+    main()
+  });
 
-Deno.cron("doDump - Run every hour", "0 1 * * *", () => {
-  async function main() {
-    const start = Date.now();
-    Deno.env.set("MAINTENANCE", "ON");
-    await doDump();
-    Deno.env.set("MAINTENANCE", "OFF");
-    console.log(`Executed CRON doDump() in ...${Date.now() - start}ms`)
+  const KV_BACKUP_BUCKET_NAME = Deno.env.get("AWS_KV_BACKUP_BUCKET_NAME");
+  if (KV_BACKUP_BUCKET_NAME) {
+    Deno.cron("doDump - Run every hour", "0 1 * * *", () => {
+      async function main() {
+        const start = Date.now();
+        Deno.env.set("MAINTENANCE", "ON");
+        await doDump();
+        Deno.env.set("MAINTENANCE", "OFF");
+        console.log(`Executed CRON doDump() in ...${Date.now() - start}ms`)
+      }
+      main()
+    });
   }
-  main()
-});
+}

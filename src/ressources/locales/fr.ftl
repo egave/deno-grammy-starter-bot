@@ -427,3 +427,7 @@ non-available=
 
 cmd_only_admin_error =
   Vous devez être administrateur pour effectuer cette action.
+
+not-found-command =
+  Commande inconnue.
+  Pour connaitre l'ensemble des commandes disponibles, utilise la commande {-cmd-help}. 

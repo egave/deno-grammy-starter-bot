@@ -5,28 +5,28 @@ import { commandTranslations } from '../config.ts'
 import handleStart from '../commands/handleStart.ts'
 import handleHelp from '../commands/handleHelp.ts'
 import handleProfile from '../commands/handleProfile.ts'
-import handleStatusUpdate from './events/handleStatusUpdate.ts'
+import handleBotUpdate from './events/handleBotUpdate.ts'
 import handleCGU from '../commands/handleCGU.ts'
 
-const composer = new Composer<CustomContext>()
+const userComposer = new Composer<CustomContext>()
 
-console.debug('Creating composer...');
+console.debug('Creating user composer...');
 
-composer.command('start', handleStart);
+userComposer.command('start', handleStart);
 
-composer.command('aide', handleHelp);
+userComposer.command('aide', handleHelp);
 
-composer.command('cgu', handleCGU);
+userComposer.command('cgu', handleCGU);
 
-composer.command('profil', handleProfile);
+userComposer.command('profil', handleProfile);
 
-composer.command('annuler', async ctx => {
+userComposer.command('annuler', async ctx => {
     console.log('** command /annuler');
     ctx.session.data.route = 'idle';
     await ctx.reply(ctx.t('cancel'));
 })
 
-composer.command(commandTranslations.quit, async ctx => {
+userComposer.command(commandTranslations.quit, async ctx => {
     console.log('** command /quitter');
     //await ctx.conversation.exit();
     // conversation are now exited from 'exitConv' middleware
@@ -35,16 +35,16 @@ composer.command(commandTranslations.quit, async ctx => {
 })
 
 // Runs the doMatch CRON
-composer.command('dostat', async ctx => {
+userComposer.command('dostat', async ctx => {
     console.log('** command /dostat');
     const result:string = await doStat();
     console.log(result);
 })
 
 // Manage status updates about your bot (to deal with 'kicked' updates)
-composer.on("my_chat_member", handleStatusUpdate)
+userComposer.on("my_chat_member", handleBotUpdate);
 
-composer.on("callback_query:data", (ctx: CustomContext) => {
+userComposer.on("callback_query:data", (ctx: CustomContext) => {
     console.debug("Inside callback_query:data");
     if (!ctx.callbackQuery || !ctx.callbackQuery.data) return;
     
@@ -59,10 +59,10 @@ composer.on("callback_query:data", (ctx: CustomContext) => {
   });
 
 /*
-composer.on("::bot_command").use(async (ctx:CustomContext) => {
+userComposer.on("::bot_command").use(async (ctx:CustomContext) => {
     console.debug(ctx)
     await ctx.reply('Commande non reconnue. Si tu as besoin d\'aide, utilise la commande /aide.')
 })
 */
 
-export { composer }
+export { userComposer }

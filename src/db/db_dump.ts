@@ -54,8 +54,13 @@ export async function doDump(s3OrFile: boolean = true): Promise<void> {
     console.error("ENVIRONMENT is not set");
     Deno.exit(1);
   }
+  const KV_BACKUP_BUCKET_NAME = Deno.env.get("AWS_KV_BACKUP_BUCKET_NAME");
+  if (!KV_BACKUP_BUCKET_NAME) {
+    console.error("KV_BACKUP_BUCKET_NAME is not set");
+    Deno.exit(1);
+  }
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); // ex. 2025-03-25T19-00-00Z
-  const fileName = `libauto_kv_backup_${environment}_${timestamp}.json`;
+  const fileName = `${KV_BACKUP_BUCKET_NAME}_${environment}_${timestamp}.json`;
   
   if (s3OrFile) {
     // Write to S3
@@ -68,4 +73,4 @@ export async function doDump(s3OrFile: boolean = true): Promise<void> {
   }
 }
 
-await doDump(false);
+//await doDump(false);

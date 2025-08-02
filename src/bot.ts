@@ -15,11 +15,12 @@ import { DEFAULTS, commandTranslations, adminCommands } from './config.ts'
 import { initSessionData } from './models/sessionData.ts'
 import type { CustomContext } from './models/customContext.ts'
 import { hasSignedCGU } from './middlewares/hasSignedCGU.ts'
-import { onlyAdmin } from './middlewares/onlyAdmin.ts'
+import { isAdmin } from './helpers/isAdmin.ts';
 import { checkMaintenance } from './middlewares/checkMaintenance.ts'
 import { exitConv } from './middlewares/exitConv.ts'
 import { adminComposer } from './composers/adminComposer.ts'
-import { composer } from './composers/index.ts'
+import { userComposer } from './composers/userComposer.ts'
+import { otherComposer } from './composers/otherComposer.ts'
 import { doCGU } from './conversations/cguConversation.ts'
 import { doProfile } from './conversations/profileConversation.ts'
 
@@ -35,8 +36,11 @@ function getSessionKey(ctx: Omit<CustomContext, 'session'>): MaybePromise<string
 async function getStorageAdapter<T>(): Promise<StorageAdapter<T> | undefined> {
   try {
       const bucketName = Deno.env.get("AWS_CONV_BUCKET_NAME");
-      if (!bucketName) {
-          throw new Error("AWS_CONV_BUCKET_NAME is not defined in environment variables");
+      if (!bucketName || bucketName === "") {
+          console.warn('WARN: AWS_CONV_BUCKET_NAME is not defined in environment variables.');
+          console.warn('WARN: Cannot initialize S3Adapter. Using default in-memory storage.');
+          //throw new Error("AWS_CONV_BUCKET_NAME is not defined in environment variables");
+          return undefined; // Retourne undefined pour utiliser le stockage par défaut de Grammy
       }
       return await S3Adapter.create<T>(bucketName); // Await the async creation
   } catch (error) {
@@ -101,10 +105,12 @@ bot.use(
 // We filter on 'bot_command' entities with '.on("message:entities:bot_command")'
 // to only execute 'hasSignedCGU' middleware on bot_commands
 // and to let pass the other messages as the CallBack queries.
+/*
 console.debug('Attaching onlyAdmin middleware...');
 bot.on("message:entities:bot_command").command(adminCommands).use(
   onlyAdmin(ctx => ctx.reply(ctx.t('cmd_only_admin_error')))
 );
+*/
 
 console.debug('Attaching underMaintenance middleware...');
 bot.on("message:entities:bot_command").command(Object.values(commandTranslations).flat()).use(
@@ -152,8 +158,15 @@ bot.on("message:entities:bot_command").use(
 
 // 9. Attach all composers to the bot as middleware
 console.debug('Attaching composers...');
-bot.use(composer);
-bot.use(adminComposer);
+bot.on("message:entities:bot_command")
+  .command(Object.values(commandTranslations).flat())
+  .use(userComposer);
+bot.on("message:entities:bot_command")
+  .command(adminCommands)
+  .filter((ctx) => isAdmin(ctx)) // filter so that only Admin users can execute 'adminCommands'
+  .use(adminComposer);
+
+bot.use(otherComposer);
 
 //CRASH HANDLER
 bot.catch((err) => {

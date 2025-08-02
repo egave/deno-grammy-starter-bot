@@ -79,6 +79,8 @@
   "deploy": {
     "project": "fb2c717e-eff1-4cf7-af59-eefe4b6f8492",
     "exclude": [
+      "**/node_modules",
+      "**/node_modules",
       "**/node_modules"
     ],
     "include": [],

@@ -1,7 +1,7 @@
 import type { CustomContext } from '../../models/customContext.ts'
 import type { User } from "types-manage"
 import { VERSION, VERSION_DATE } from '../../config.ts'
-import { isAdmin } from '../../helpers/isAdmin.ts';
+//import { isAdmin } from '../../helpers/isAdmin.ts';
 
                             
 export default async function handleInfo(ctx: CustomContext) {
@@ -9,10 +9,11 @@ export default async function handleInfo(ctx: CustomContext) {
 
     // This command is only available to ADMINs of the BOT
     // Specifically specified in the BOT_ADMIN array 
-    if (!isAdmin(ctx)) {
+    /*if (!isAdmin(ctx)) {
         await ctx.reply(ctx.t('cmd_only_admin_error'));
         return;
     }
+    */
 
     if (ctx.from)
     {

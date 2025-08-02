@@ -1,5 +1,6 @@
-export const VERSION = "V2.0"
-export const VERSION_DATE = "07-07-2025" 
+export const VERSION = "V2.1"
+export const VERSION_DATE = "02-08-2025" 
+export const VERSION_NOTES = "Version V2.1-bêta de DenoGrammyStarter Bot" 
 export const BOT_USERNAME = "@DenoGrammyStarter_bot";
 export const DEV_USERNAME = "@Enguerrand94"
 
@@ -97,4 +98,4 @@ export const commandTranslations = {
       ]
   };
 
-export const adminCommands = ['info', 'cmds', 'flyer', 'map', 'logctx', 'delctx', 'mig', 'ls', 'lk', 'lv', 'lvs', 'sd', 'ds', 'delkeys', 'add', 'ddd'];
+export const adminCommands = ['info', 'cmds', 'flyer', 'map', 'logctx', 'delctx', 'mig', 'ls', 'kv', 'lv', 'lvs', 'sd', 'ds', 'delkeys', 'add', 'ddd'];

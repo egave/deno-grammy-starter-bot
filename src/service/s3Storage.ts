@@ -1,7 +1,8 @@
 import { StorageAdapter } from "grammyjs"
 import { S3, S3Bucket } from "s3"
 import { DEFAULTS } from '../config.ts'
-  
+
+const ENVIRONMENT = Deno.env.get("ENVIRONMENT");
 const ACCESS_KEY = Deno.env.get("AWS_ACCESS_KEY");
 const SECRET_KEY = Deno.env.get("AWS_SECRET_KEY");
 const REGION = DEFAULTS.S3.REGION;
@@ -11,32 +12,35 @@ const KV_BACKUP_BUCKET_NAME = Deno.env.get("AWS_KV_BACKUP_BUCKET_NAME");
 // console.debug(`BUCKET_NAME: ${BUCKET_NAME}`);
 
 // Vérification des clés d'accès AWS
-if (!ACCESS_KEY || !SECRET_KEY || !REGION || !KV_BACKUP_BUCKET_NAME) {
+if (ENVIRONMENT !== "local" && (!ACCESS_KEY || !SECRET_KEY || !REGION || !KV_BACKUP_BUCKET_NAME)) {
     throw new Error("Missing AWS credentials. Please set AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION and AWS_KV_BACKUP_BUCKET_NAME environment variables.");
 }
 
-const ENDPOINT_URL = `https://s3.${REGION}.amazonaws.com`;
+const ENDPOINT_URL = REGION ? `https://s3.${REGION}.amazonaws.com` : undefined;
 
 // Configuration du client S3
-const s3 = new S3({
+const s3 = (ACCESS_KEY && SECRET_KEY && REGION) ? new S3({
     accessKeyID: ACCESS_KEY, // Remplacez par votre clé d'accès AWS
     secretKey: SECRET_KEY, // Remplacez par votre clé secrète AWS
     region: DEFAULTS.S3.REGION, // Exemple : "eu-west-1"
     endpointURL: ENDPOINT_URL // URL du endpoint S3
-});
+}) : null;
 
 // Récupération du bucket de sauvegarde KV
-export const s3_backup_bucket: S3Bucket = s3.getBucket(KV_BACKUP_BUCKET_NAME);
+export const s3_backup_bucket: S3Bucket | null = (s3 && KV_BACKUP_BUCKET_NAME) ? s3.getBucket(KV_BACKUP_BUCKET_NAME) : null;
 
 // Adaptateur personnalisé S3 pour les conversations GrammyJS 
 class S3Adapter<T> implements StorageAdapter<T> {
-    private bucket!: S3Bucket;
+    private bucket: S3Bucket;
 
     private constructor(bucket: S3Bucket) {
         this.bucket = bucket; // Private constructor for factory method
     }
 
     static async create<T>(bucketName: string): Promise<S3Adapter<T>> {
+        if (!s3) {
+            throw new Error("S3 client is not initialized due to missing AWS credentials.");
+        }
         const bucket = s3.getBucket(bucketName);
         if (!bucket) {
             throw new Error("s3.getBucket returned null or undefined");
