@@ -65,10 +65,10 @@
     "deployPROD": "deployctl deploy --project=deno-grammy-starter-bot --prod --save-config src/server.ts"
   },
   "imports": {
-    "grammyjs": "https://deno.land/x/grammy@v1.35.0/mod.ts",
-    "grammyConversations": "https://deno.land/x/grammy_conversations@v2.0.1/mod.ts",
-    "grammy-types-manage": "https://deno.land/x/grammy_types@v3.20.0/manage.ts",
-    "grammy-types-message": "https://deno.land/x/grammy_types@v3.20.0/message.ts",
+    "grammyjs": "https://deno.land/x/grammy@v1.38.2/mod.ts",
+    "grammyConversations": "https://deno.land/x/grammy_conversations@v2.1.0/mod.ts",
+    "grammy-types-manage": "https://deno.land/x/grammy_types@v3.22.1/manage.ts",
+    "grammy-types-message": "https://deno.land/x/grammy_types@v3.22.1/message.ts",
     "rate-limiter": "https://deno.land/x/grammy_ratelimiter@v1.2.1/mod.ts",
     "grammyThrottler": "https://deno.land/x/grammy_transformer_throttler@v1.2.1/mod.ts",
     "i18n": "https://deno.land/x/grammy_i18n@v1.1.0/mod.ts",
@@ -79,8 +79,6 @@
   "deploy": {
     "project": "fb2c717e-eff1-4cf7-af59-eefe4b6f8492",
     "exclude": [
-      "**/node_modules",
-      "**/node_modules",
       "**/node_modules"
     ],
     "include": [],

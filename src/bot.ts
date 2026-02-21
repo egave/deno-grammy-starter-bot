@@ -1,4 +1,4 @@
-import { Bot, session, MaybePromise, StorageAdapter, GrammyError, HttpError } from 'grammyjs'
+import { Bot, session, MaybePromise, StorageAdapter, GrammyError, HttpError, NextFunction } from 'grammyjs'
 import { apiThrottler } from 'grammyThrottler'
 import { limit } from "rate-limiter"
 import { S3Adapter } from './service/s3Storage.ts'
@@ -11,7 +11,7 @@ import {
 } from "grammyConversations"
 import { I18n } from "i18n"
 import kv from './db/db.ts'
-import { DEFAULTS, commandTranslations, adminCommands } from './config.ts'
+import { DEFAULTS, globalCommandTranslations, commandTranslations, adminCommands } from './config.ts'
 import { initSessionData } from './models/sessionData.ts'
 import type { CustomContext } from './models/customContext.ts'
 import { hasSignedCGU } from './middlewares/hasSignedCGU.ts'
@@ -35,17 +35,17 @@ function getSessionKey(ctx: Omit<CustomContext, 'session'>): MaybePromise<string
 // Fonction pour tenter de créer l'adaptateur S3 ou retourner undefined (repli sur mémoire par défaut)
 async function getStorageAdapter<T>(): Promise<StorageAdapter<T> | undefined> {
   try {
-      const bucketName = Deno.env.get("AWS_CONV_BUCKET_NAME");
-      if (!bucketName || bucketName === "") {
-          console.warn('WARN: AWS_CONV_BUCKET_NAME is not defined in environment variables.');
-          console.warn('WARN: Cannot initialize S3Adapter. Using default in-memory storage.');
-          //throw new Error("AWS_CONV_BUCKET_NAME is not defined in environment variables");
-          return undefined; // Retourne undefined pour utiliser le stockage par défaut de Grammy
-      }
-      return await S3Adapter.create<T>(bucketName); // Await the async creation
-  } catch (error) {
-      console.warn(`Failed to initialize S3Adapter: ${error.message}. Falling back to default in-memory storage.`);
+    const bucketName = Deno.env.get("AWS_CONV_BUCKET_NAME");
+    if (!bucketName || bucketName === "") {
+      console.warn('WARN: AWS_CONV_BUCKET_NAME is not defined in environment variables.');
+      console.warn('WARN: Cannot initialize S3Adapter. Using default in-memory storage.');
+      //throw new Error("AWS_CONV_BUCKET_NAME is not defined in environment variables");
       return undefined; // Retourne undefined pour utiliser le stockage par défaut de Grammy
+    }
+    return await S3Adapter.create<T>(bucketName); // Await the async creation
+  } catch (error) {
+    console.warn(`Failed to initialize S3Adapter: ${error.message}. Falling back to default in-memory storage.`);
+    return undefined; // Retourne undefined pour utiliser le stockage par défaut de Grammy
   }
 }
 
@@ -60,8 +60,8 @@ bot.use(limit({
   limit: 3,
   // "MEMORY_STORAGE" is the default mode. Therefore if you want to use Redis, do not pass storageClient at all.
   storageClient: "MEMORY_STORE",
-  onLimitExceeded: async (ctx: CustomContext) => { 
-      await ctx.reply(ctx.t("rate-limit-reached")) 
+  onLimitExceeded: async (ctx: CustomContext) => {
+    await ctx.reply(ctx.t("rate-limit-reached"))
   },
   // Note that the key should be a number in string format such as "123456789"
   keyGenerator: (ctx: CustomContext) => { return ctx.from?.id.toString() }
@@ -92,7 +92,7 @@ console.debug('Attaching session...');
 bot.use(
   session({
     type: "multi",
-    data :
+    data:
     {
       initial: initSessionData,
       getSessionKey,
@@ -124,73 +124,95 @@ bot.on("message:entities:bot_command").command(Object.values(commandTranslations
 console.debug('Attaching hasSignedCGU middleware...');
 bot.on("message:entities:bot_command").command([...commandTranslations.profile]).use(
   hasSignedCGU(ctx => ctx.reply(ctx.t('need-sign-cgu'),
-                              { parse_mode: "HTML" }))
+    { parse_mode: "HTML" }))
 );
 
 // 6. Attach all conversations to the bot as middleware
 console.debug('Attaching conversations...');
+
+// 7.1. Get the storage adapter once to reuse it in a middleware
+const conversationStorage = await getStorageAdapter().catch(() => undefined);
+
+// 7.2. GLOBAL INTERCEPTOR: Exit any active conversation IF it is a global command
+// This allows global commands to interrupt an active conversation.
+bot.on("message:entities:bot_command")
+  .command(Object.values(globalCommandTranslations).flat())
+  .use(async (ctx: CustomContext, next: NextFunction) => {
+    const userId = ctx.from?.id;
+    if (userId && conversationStorage) {
+      const key = `${userId}`;
+      console.debug(`[INTERCEPTOR] Global command detected. Clearing conversation state for user ${userId}`);
+      await conversationStorage.delete(key);
+    }
+    await next();
+  });
+
 bot.use(conversations({
-    // UNFORTUNATELY DO NOT WORK under deno deploy -> we got a PermissionDenied: Requires write access to /src/libauto-conv-data, which cannot be granted in this environment
-    //storage: new FileAdapter({ dirName: "libauto-conv-data" }),
-    // So we use a custom S3 adapter
-    storage: await getStorageAdapter().catch(() => undefined), // Handle async failure
-    plugins: [i18n],
-    onEnter(id, ctx) {
-      // Entered conversation `id`.
-      console.debug(`Conversation ${id} entered by ${ctx.from?.id}`);
-    },
-    onExit(id, ctx) {
-      // Exited conversation `id`.
-      console.debug(`Conversation ${id} exited by ${ctx.from?.id}`);
-    },
+  // UNFORTUNATELY DO NOT WORK under deno deploy -> we got a PermissionDenied: Requires write access to /src/libauto-conv-data, which cannot be granted in this environment
+  //storage: new FileAdapter({ dirName: "libauto-conv-data" }),
+  // So we use a custom S3 adapter
+  storage: await getStorageAdapter().catch(() => undefined), // Handle async failure
+  plugins: [i18n],
+  onEnter(id, ctx) {
+    // Entered conversation `id`.
+    console.debug(`Conversation ${id} entered by ${ctx.from?.id}`);
+  },
+  onExit(id, ctx) {
+    // Exited conversation `id`.
+    console.debug(`Conversation ${id} exited by ${ctx.from?.id}`);
+  },
 }));
 
 bot.use(createConversation(doCGU, DEFAULTS.CONFIG.CONVERSATION.COMMON_OPTIONS));
 bot.use(createConversation(doProfile, DEFAULTS.CONFIG.CONVERSATION.COMMON_OPTIONS));
 
 // 8. Attach custom middleware to quit any conversation if it is a known command
-console.debug('Attaching exitConv...');
-bot.on("message:entities:bot_command").use(
-  exitConv(/*ctx => ctx.reply(ctx.t('error-exiting-conversation'),
-            { parse_mode: "HTML" })*/)
-);
+// console.debug('Attaching exitConv...');
+// bot.on("message:entities:bot_command").use(
+//   exitConv(/*ctx => ctx.reply(ctx.t('error-exiting-conversation'),
+//             { parse_mode: "HTML" })*/)
+// );
 
 
 // 9. Attach all composers to the bot as middleware
 console.debug('Attaching composers...');
+// 9.1 Attach 'userComposer' with user commands
 bot.on("message:entities:bot_command")
-  .command(Object.values(commandTranslations).flat())
+  .command(Object.values(globalCommandTranslations).flat())
   .use(userComposer);
+bot.on("callback_query:data")
+  .use(userComposer);
+// 9.2 Attach 'adminComposer' with admin commands (if user is admin)
 bot.on("message:entities:bot_command")
   .command(adminCommands)
   .filter((ctx) => isAdmin(ctx)) // filter so that only Admin users can execute 'adminCommands'
   .use(adminComposer);
-
+// 9.3 Attach 'otherComposer' for other commands
 bot.use(otherComposer);
 
 //CRASH HANDLER
 bot.catch((err) => {
   const ctx = err.ctx;
   console.error(
-      `[bot-catch][Error while handling update ${ctx.update.update_id}]`,
-      { metadata: err.error }
+    `[bot-catch][Error while handling update ${ctx.update.update_id}]`,
+    { metadata: err.error }
   );
   const e = err.error;
 
   if (e instanceof GrammyError) {
     console.error(`[bot-catch][Error in request ${ctx.update.update_id}]`, {
-          metadata: e.message,
-          stack: e.stack,
-      });
+      metadata: e.message,
+      stack: e.stack,
+    });
   } else if (e instanceof HttpError) {
-      console.error(`[bot-catch][Error in request ${ctx.update.update_id}]`, {
-          metadata: e.error,
-          stack: e.stack,
-      });
+    console.error(`[bot-catch][Error in request ${ctx.update.update_id}]`, {
+      metadata: e.error,
+      stack: e.stack,
+    });
   } else {
-      console.error(`[bot-catch][Error in request ${ctx.update.update_id}]`, {
-          metadata: e,
-      });
+    console.error(`[bot-catch][Error in request ${ctx.update.update_id}]`, {
+      metadata: e,
+    });
   }
 });
 // 6. Start the bot

@@ -1,5 +1,5 @@
 import type { CustomContext, MyConversation } from '../../models/customContext.ts'
-import { DEFAULTS, commandTranslations } from '../../config.ts'
+import { DEFAULTS, flowCommandTranslations } from '../../config.ts'
 /**
  * Handles invalid user input by sending an error message and deleting both the error message and the user's message after a delay.
  * 
@@ -8,9 +8,9 @@ import { DEFAULTS, commandTranslations } from '../../config.ts'
  */
 export async function handleInvalidUserInput(ctx: CustomContext): Promise<void> {
     if (ctx.message && !ctx.message?.text?.startsWith('/')) {
-        const useButtonsMessage = await ctx.reply(ctx.t('use-buttons-error', 
-                            {"delay": DEFAULTS.CONFIG.MESSAGE_DELETE_DELAY/1000}),
-                                                { parse_mode: "HTML" });
+        const useButtonsMessage = await ctx.reply(ctx.t('use-buttons-error',
+            { "delay": DEFAULTS.CONFIG.MESSAGE_DELETE_DELAY / 1000 }),
+            { parse_mode: "HTML" });
         // Delete the messages after a delay
         setTimeout(async () => {
             try {
@@ -26,39 +26,33 @@ export async function handleInvalidUserInput(ctx: CustomContext): Promise<void> 
 }
 
 // Helper function for invalid input handling
-export async function handleInvalidIntInput(ctx: CustomContext, validCmds: {cancel: boolean, back: boolean} = {cancel: false, back: false}): Promise<void> {
+export async function handleInvalidIntInput(ctx: CustomContext, validCmds: { cancel: boolean, back: boolean } = { cancel: false, back: false }): Promise<void> {
     if (ctx.message?.text?.startsWith('/')) {
         const cmd = ctx.message.text.replace(/^\//, '').trim();
         const chat_id = ctx.from?.id;
-        if (validCmds.cancel && commandTranslations['cancel'].includes(cmd)) {
+        if (validCmds.cancel && flowCommandTranslations.cancel.includes(cmd)) {
             // Delete the user's message
             await ctx.api.deleteMessage(chat_id!, ctx.message!.message_id);
             throw new Error("USER_CANCEL"); // Signal to exit with cancel effect
         }
-        if (validCmds.back && commandTranslations['back'].includes(cmd)) {
+        if (validCmds.back && flowCommandTranslations.back.includes(cmd)) {
             throw new Error("USER_BACK"); // Signal to exit with back effect
-        }
-        if (commandTranslations['quit'].includes(cmd)) {
-            throw new Error("USER_QUIT"); // Signal to exit
         }
     }
     await ctx.reply(ctx.t('expected-number-error'));
 }
 // Helper function for invalid input handling
-export async function handleInvalidWaitInput(ctx: CustomContext, validCmds: {cancel: boolean, back: boolean} = {cancel: false, back: false}) {
+export async function handleInvalidWaitInput(ctx: CustomContext, validCmds: { cancel: boolean, back: boolean } = { cancel: false, back: false }) {
     if (ctx.message?.text?.startsWith('/')) {
         const cmd = ctx.message.text.replace(/^\//, '').trim();
         const chat_id = ctx.from?.id;
-        if (validCmds.cancel && commandTranslations['cancel'].includes(cmd)) {
+        if (validCmds.cancel && flowCommandTranslations.cancel.includes(cmd)) {
             // Delete the user's message
             await ctx.api.deleteMessage(chat_id!, ctx.message!.message_id);
             throw new Error("USER_CANCEL"); // Signal to exit with cancel effect
         }
-        if (validCmds.back && commandTranslations['back'].includes(cmd)) {
+        if (validCmds.back && flowCommandTranslations.back.includes(cmd)) {
             throw new Error("USER_BACK"); // Signal to exit with back effect
-        }
-        if (commandTranslations['quit'].includes(cmd)) {
-            throw new Error("USER_QUIT"); // Signal to exit with quit effect
         }
     }
     await ctx.reply(ctx.t('use-buttons-error-no-delay'));

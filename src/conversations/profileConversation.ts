@@ -2,26 +2,29 @@
 
 import { InlineKeyboard } from 'grammyjs'
 //import type { Conversation } from 'grammyConversations'
-import { commandTranslations } from '../config.ts';
+import { flowCommandTranslations } from '../config.ts';
 import type { CustomContext, MyConversation } from '../models/customContext.ts'
 import { cleanInput, handleInvalidUserInput } from './utils/convUtils.ts'
 import { nowUTC } from '../helpers/dateHelpers.ts'
 import { CommunesByCodePostal } from '../ressources/communes-france-by-cp.ts'
 import type { Commune } from '../models/communes.ts'
-import { inlineYesNoKeyboardButtons,
+import {
+    inlineYesNoKeyboardButtons,
     inlineGenderKeyboardButtons,
     inlineProfileMenuKeyboardButtons,
     inlineBirthdayDecadeKeyboardButtons,
     inlineBirthdayYearKeyboardButtons,
     inlineBirthdayMonthKeyboardButtons,
     inlineBirthdayDayKeyboardButtons
- } from '../helpers/inlineKeyboards.ts'
+} from '../helpers/inlineKeyboards.ts'
 import { Photo, BaseProfile } from '../models/profile.ts'
 import { UserActivityLog } from '../models/userActivityLog.ts'
 import { logUserActivity } from '../service/dbUserActivityLog.ts'
 import { Gender, Profile } from '../models/profile.ts'
-import { getProfile, insertProfile, updateProfile, 
-        deleteProfile, deletePhotoProfile } from '../service/dbProfile.ts'
+import {
+    getProfile, insertProfile, updateProfile,
+    deleteProfile, deletePhotoProfile
+} from '../service/dbProfile.ts'
 
 //type profileConversation = Conversation<Context>;
 
@@ -42,7 +45,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
     // Le profile n'existe pas
     if (!profile) {
         const confirmNewProfileRes = await confirmNewProfile(conversation, ctx);
-        
+
         if (!confirmNewProfileRes) {
             await ctx.reply(ctx.t('profile-create-no'));
             return;
@@ -56,7 +59,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
 
             // ask the user for the bio
             const bio: string | undefined = await doBio(conversation, ctx);
-            
+
             const p: Profile = new Profile(nowUTC(), baseProfile, bio);
 
             // ask the user the questions for the photo
@@ -67,9 +70,9 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
             } else {
                 await ctx.reply(ctx.t('profile-photo-upload-confirmation-no'));
             }
-            
+
             // Insert profile to the database
-            await conversation.external(async () =>  {
+            await conversation.external(async () => {
                 const insertProfileRes = await insertProfile(p);
                 if (insertProfileRes.ok) {
                     const actionLog: UserActivityLog = {
@@ -78,7 +81,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                         versionstamp: insertProfileRes.versionstamp
                     };
                     await logUserActivity(actionLog);
-                
+
                     await ctx.reply(ctx.t('profile-save-new-OK'));
                 }
                 else {
@@ -88,7 +91,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                         msg = `Cannot insert profile. Profile with ID ${p.getUserId()} already exists.`
                     else if (insertProfileRes.errorCode === "ERR_MAX_RETRIES_EXCEEDED")
                         msg = `Too many retries while inserting the profile with ID ${p.getUserId()}.`
-                    
+
                     const actionErrorLog: UserActivityLog = {
                         action: "create_profile",
                         userId: p.getUserId(),
@@ -132,9 +135,9 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                         await ctx.reply(ctx.t('profile-photo-upload-confirmation-no'));
                     }
                 }
-                await conversation.external(async () =>  {
+                await conversation.external(async () => {
                     const updateProfileRes = await updateProfile(profile);
-                
+
                     if (updateProfileRes.ok) {
                         const actionLog: UserActivityLog = {
                             action: "update_profile",
@@ -143,7 +146,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                             details: { sub_action: "edit_profile" }
                         };
                         await logUserActivity(actionLog);
-                    
+
                         await ctx.reply(ctx.t('profile-save-OK'));
                     } else {
                         // Log the error as part of user activity
@@ -163,25 +166,27 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                                 code: updateProfileRes.errorCode,
                                 message: msg
                             },
-                            details: { sub_action: "edit_profile",
-                                    profileData: profile }, // Include relevant context
+                            details: {
+                                sub_action: "edit_profile",
+                                profileData: profile
+                            }, // Include relevant context
                         };
-        
+
                         await logUserActivity(actionErrorLog);
-        
+
                         await ctx.reply(ctx.t('profile-save-KO'));
                     }
                 }); // End of conversation.external
             }
-            break;
+                break;
             case "delete": {
                 await conversation.log("deleteProfile");
                 // L'utilisateur veut supprimer son profil. On lui demande confirmation
                 const confirmation = await confirmDeleteProfile(conversation, ctx);
                 if (confirmation) {
-                    await conversation.external(async () =>  {
+                    await conversation.external(async () => {
                         const deleteProfileRes = await deleteProfile(profile.getUserId());
-                    
+
                         if (deleteProfileRes.ok) {
                             const actionLog: UserActivityLog = {
                                 action: "delete_profile",
@@ -189,9 +194,9 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                                 versionstamp: deleteProfileRes.versionstamp
                             };
                             await logUserActivity(actionLog);
-                        
+
                             await ctx.reply(ctx.t('profile-delete-OK'),
-                                    {parse_mode: "HTML"});
+                                { parse_mode: "HTML" });
                         }
                         else {
                             // Log the error as part of user activity
@@ -211,9 +216,9 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                                 },
                                 details: { profileData: profile }, // Include relevant context
                             };
-            
+
                             await logUserActivity(actionErrorLog);
-            
+
                             await ctx.reply(ctx.t('profile-delete-KO'));
                         }
                     }); // End of conversation.external
@@ -222,68 +227,70 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                     await ctx.reply(ctx.t('profile-delete-confirmation-no'));
                 }
             }
-            break;
+                break;
             case "do-photo": {
-                    await conversation.log("doPhoto");
-                    const photo: Photo[] | undefined = await doPhotoProfile(conversation, ctx);
-                    if (photo) {
-                        profile.photos = photo;
-                        await conversation.external(async () =>  {
-                            const updateProfileRes = await updateProfile(profile);
-                        
-                            if (updateProfileRes.ok) {
-                                const actionLog: UserActivityLog = {
-                                    action: "update_profile",
-                                    userId: profile.getUserId(),
-                                    versionstamp: updateProfileRes.versionstamp,
-                                    details: { sub_action: "save_photo" }
-                                };
-                                await logUserActivity(actionLog);
-                            
-                                await ctx.reply(ctx.t('profile-photo-changed-OK'));
-                            } else {
-                                // Log the error as part of user activity
-                                let msg = "Unkwown error occurred while updating the profile.";
-                                if (updateProfileRes.errorCode === "ERR_PROFILE_MISMATCH")
-                                    msg = `Cannot update, Profile mismatch ${profile.getUserId()} not found`;
-                                else if (updateProfileRes.errorCode === "ERR_PROFILE_NOT_FOUND")
-                                    msg = `Cannot update, Profile ${profile.getUserId()} not found`;
-                                else if (updateProfileRes.errorCode === "ERR_MAX_RETRIES_EXCEEDED")
-                                    msg = `Too many retries while updating the profile with ID ${profile.getUserId()}.`
-            
-                                // Log the error as part of user activity
-                                const actionErrorLog: UserActivityLog = {
-                                    action: "update_profile",
-                                    userId: profile.getUserId(),
-                                    error: {
-                                        code: updateProfileRes.errorCode,
-                                        message: msg
-                                    },
-                                    details: { sub_action: "save_photo",
-                                                profileData: profile } // Include relevant context
-                                };
-                
-                                await logUserActivity(actionErrorLog);
-                
-                                await ctx.reply(ctx.t('profile-photo-upload-KO'));
-                            }
-                        }); // End of conversation.external
-                    } else {
-                        if (profile.photos === undefined || profile.photos.length === 0)
-                            await ctx.reply(ctx.t('profile-photo-upload-confirmation-no'));
-                        else 
-                            await ctx.reply(ctx.t('profile-photo-change-confirmation-no'));
-                    }
+                await conversation.log("doPhoto");
+                const photo: Photo[] | undefined = await doPhotoProfile(conversation, ctx);
+                if (photo) {
+                    profile.photos = photo;
+                    await conversation.external(async () => {
+                        const updateProfileRes = await updateProfile(profile);
+
+                        if (updateProfileRes.ok) {
+                            const actionLog: UserActivityLog = {
+                                action: "update_profile",
+                                userId: profile.getUserId(),
+                                versionstamp: updateProfileRes.versionstamp,
+                                details: { sub_action: "save_photo" }
+                            };
+                            await logUserActivity(actionLog);
+
+                            await ctx.reply(ctx.t('profile-photo-changed-OK'));
+                        } else {
+                            // Log the error as part of user activity
+                            let msg = "Unkwown error occurred while updating the profile.";
+                            if (updateProfileRes.errorCode === "ERR_PROFILE_MISMATCH")
+                                msg = `Cannot update, Profile mismatch ${profile.getUserId()} not found`;
+                            else if (updateProfileRes.errorCode === "ERR_PROFILE_NOT_FOUND")
+                                msg = `Cannot update, Profile ${profile.getUserId()} not found`;
+                            else if (updateProfileRes.errorCode === "ERR_MAX_RETRIES_EXCEEDED")
+                                msg = `Too many retries while updating the profile with ID ${profile.getUserId()}.`
+
+                            // Log the error as part of user activity
+                            const actionErrorLog: UserActivityLog = {
+                                action: "update_profile",
+                                userId: profile.getUserId(),
+                                error: {
+                                    code: updateProfileRes.errorCode,
+                                    message: msg
+                                },
+                                details: {
+                                    sub_action: "save_photo",
+                                    profileData: profile
+                                } // Include relevant context
+                            };
+
+                            await logUserActivity(actionErrorLog);
+
+                            await ctx.reply(ctx.t('profile-photo-upload-KO'));
+                        }
+                    }); // End of conversation.external
+                } else {
+                    if (profile.photos === undefined || profile.photos.length === 0)
+                        await ctx.reply(ctx.t('profile-photo-upload-confirmation-no'));
+                    else
+                        await ctx.reply(ctx.t('profile-photo-change-confirmation-no'));
                 }
-            break;
+            }
+                break;
             case "delete-photo": {
                 await conversation.log("deletePhoto");
                 const confirmation = await confirmDeletePhotoProfile(conversation, ctx);
-                if (confirmation) {    
+                if (confirmation) {
                     // Suppression de la photo de profile de la base de données.
-                    await conversation.external(async () =>  {
+                    await conversation.external(async () => {
                         const deletePhotoProfileRes = await deletePhotoProfile(profile);
-                    
+
                         if (deletePhotoProfileRes.ok) {
                             const actionLog: UserActivityLog = {
                                 action: "update_profile",
@@ -292,7 +299,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                                 details: { sub_action: "delete_photo" }
                             };
                             await logUserActivity(actionLog);
-                        
+
                             await ctx.reply(ctx.t('profile-photo-delete-OK'));
                         } else {
                             // Log the error as part of user activity
@@ -303,7 +310,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                                 msg = `Cannot delete photo, Profile ${profile.getUserId()} not found`;
                             else if (deletePhotoProfileRes.errorCode === "ERR_MAX_RETRIES_EXCEEDED")
                                 msg = `Too many retries while deleting the photo profile with ID ${profile.getUserId()}.`
-        
+
                             // Log the error as part of user activity
                             const actionErrorLog: UserActivityLog = {
                                 action: "update_profile",
@@ -312,12 +319,14 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                                     code: deletePhotoProfileRes.errorCode,
                                     message: msg
                                 },
-                                details: { sub_action: "delete_photo",
-                                            profileData: profile }, // Include relevant context
+                                details: {
+                                    sub_action: "delete_photo",
+                                    profileData: profile
+                                }, // Include relevant context
                             };
-            
+
                             await logUserActivity(actionErrorLog);
-            
+
                             await ctx.reply(ctx.t('profile-photo-delete-KO'));
                         }
                     }); // End of conversation.external
@@ -325,16 +334,16 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                 else
                     await ctx.reply(ctx.t('profile-photo-delete-confirmation-no'));
             }
-            break;
+                break;
             case "do-bio": {
                 await conversation.log("doBio");
                 // Ask the user for the bio
                 const bio: string | undefined = await doBio(conversation, ctx, profile);
                 if (bio !== undefined) {
                     profile.bio = bio;
-                    await conversation.external(async () =>  {
+                    await conversation.external(async () => {
                         const updateProfileRes = await updateProfile(profile);
-                    
+
                         if (updateProfileRes.ok) {
                             const actionLog: UserActivityLog = {
                                 action: "update_profile",
@@ -343,7 +352,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                                 details: { sub_action: "edit_bio" }
                             };
                             await logUserActivity(actionLog);
-                        
+
                             await ctx.reply(ctx.t('profile-bio-save-OK'));
                         } else {
                             // Log the error as part of user activity
@@ -363,12 +372,14 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                                     code: updateProfileRes.errorCode,
                                     message: msg
                                 },
-                                details: { sub_action: "edit_bio",
-                                        profileData: profile }, // Include relevant context
+                                details: {
+                                    sub_action: "edit_bio",
+                                    profileData: profile
+                                }, // Include relevant context
                             };
-            
+
                             await logUserActivity(actionErrorLog);
-            
+
                             await ctx.reply(ctx.t('profile-bio-save-KO'));
                         }
                     }); // End of conversation.external
@@ -390,7 +401,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
                     await ctx.reply(ctx.t('profile-write-bio'));
                 */
             }
-            break;
+                break;
             default:
                 await conversation.error("There is no such action: " + action);
                 break;
@@ -401,7 +412,7 @@ export async function doProfile(conversation: MyConversation, ctx: CustomContext
 
 // Define the function to ask if user wants to create a new profile
 async function confirmNewProfile(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext
 ): Promise<boolean> {
 
@@ -409,7 +420,7 @@ async function confirmNewProfile(
     await ctx.reply(ctx.t('profile-create'), {
         reply_markup: inlineYesNoKeyboardButtons(ctx)
     });
-    
+
     // Listen for user responses via callback data
     const response = await conversation.waitForCallbackQuery(["y", "n"], {
         otherwise: async (ctx: CustomContext) => {
@@ -421,17 +432,16 @@ async function confirmNewProfile(
     if (response.callbackQuery.data.match(/y/i)) {
         return true;
     }
-    
+
     return false;
 }
 
 /** Defines "creerProfile" conversation */
 async function doBaseProfile(
-    conversation: MyConversation, 
-    ctx: CustomContext) : Promise<BaseProfile | undefined>
-{
+    conversation: MyConversation,
+    ctx: CustomContext): Promise<BaseProfile | undefined> {
     console.log("Inside doBaseProfile conversation");
-    
+
     // Asking for the gender
     const gender: Gender = await askForGender(conversation, ctx);
 
@@ -442,19 +452,19 @@ async function doBaseProfile(
     }
     // Asking for the municipality
     //const { postal_code_text, chosenCommune } = await askForMunicipality(conversation, ctx, 'profile-create-step3');
-    
+
     await conversation.log("birthday: ", birthday);
     await conversation.log("username: ", ctx.from?.username);
     await conversation.log("first_name: ", ctx.from?.first_name);
     await conversation.log("last_name: ", ctx.from?.last_name);
-    const baseProfile: BaseProfile = new BaseProfile( 
+    const baseProfile: BaseProfile = new BaseProfile(
         ctx.from!.id,
-        ctx.from!.first_name, 
-        gender, 
+        ctx.from!.first_name,
+        gender,
         birthday,
         // postal_code: postal_code_text,
         // commune: chosenCommune, 
-        ctx.from?.username, 
+        ctx.from?.username,
         ctx.from?.last_name);
 
     await conversation.log("baseProfile: ", baseProfile);
@@ -464,7 +474,7 @@ async function doBaseProfile(
 
 // Function that asks for usr gender
 async function askForGender(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext
 ): Promise<Gender> {
 
@@ -474,24 +484,24 @@ async function askForGender(
     });
 
     // Attend la réponse de l'utilisateur.
-    const resGender = await conversation.waitForCallbackQuery(["w", "m"],{
+    const resGender = await conversation.waitForCallbackQuery(["w", "m"], {
         otherwise: async (ctx: CustomContext) => {
             await handleInvalidUserInput(ctx);
         }
     });
-    const gender: Gender = resGender.callbackQuery.data.match(/w/i)? Gender.Woman : Gender.Man;
+    const gender: Gender = resGender.callbackQuery.data.match(/w/i) ? Gender.Woman : Gender.Man;
     await conversation.log("gender: ", gender);
-    
+
     return gender;
 };
 
 // Function that asks for user birthday
 async function askForBirthday(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext,
     g: Gender
 ): Promise<number | undefined> {
-    
+
     // Asking for the birthdayDecade
     const birthdayDecade: string = await askForBirthdayDecade(conversation, ctx, g);
     if (birthdayDecade === 'birthday-skip')
@@ -504,20 +514,20 @@ async function askForBirthday(
     // Asking for the birthdayDay
     const birthdayDay: string = await askForBirthdayDay(conversation, ctx, birthdayYear!, birthdayMonth!);
 
-    if (!birthdayYear ||!birthdayMonth ||!birthdayDay)
+    if (!birthdayYear || !birthdayMonth || !birthdayDay)
         return;
-    
+
     const birthday = new Date(Date.UTC(parseInt(birthdayYear), parseInt(birthdayMonth) - 1, parseInt(birthdayDay)));
     const birthdayTimestamp = birthday.getTime() / 1000; // Convert to seconds
     await conversation.log("birthday: " + birthdayYear + "-" + birthdayMonth + "-" + birthdayDay);
     await conversation.log("birthday: ", birthdayTimestamp);
     await conversation.log("Birthday Date:", new Date(birthdayTimestamp * 1000));
-    
+
     return birthdayTimestamp;
 };
 
 async function askForBirthdayDecade(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext,
     g: Gender
 ): Promise<string> {
@@ -526,7 +536,7 @@ async function askForBirthdayDecade(
     // Send the first message with the inline keyboard
     const { inlineKeyboard, decadeValues } = inlineBirthdayDecadeKeyboardButtons(ctx);
     await conversation.log("decadeValues : ", decadeValues);
-    
+
     // Demande à l'utilisateur sa décennie.
     const message = await ctx.reply(ctx.t('profile-ask-for-decade', { gender: g }), {
         reply_markup: inlineKeyboard,
@@ -551,12 +561,12 @@ async function askForBirthdayDecade(
     let returnedMessage = 'birthday-decade-selected';
     if (selectedDecade === 'birthday-skip')
         returnedMessage = 'birthday-skipped';
-        
+
     // Clear the inline keyboard and show the selected decade
     const resultInlineKeyboard = new InlineKeyboard();
     resultInlineKeyboard.text(ctx.t(returnedMessage, {
         "decade": selectedDecade
-        }),
+    }),
         'void');
 
     await ctx.editMessageReplyMarkup({
@@ -569,7 +579,7 @@ async function askForBirthdayDecade(
 };
 
 async function askForBirthdayYear(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext,
     decade: string
 ): Promise<string> {
@@ -604,7 +614,7 @@ async function askForBirthdayYear(
     const resultInlineKeyboard = new InlineKeyboard();
     resultInlineKeyboard.text(ctx.t('birthday-year-selected', {
         "year": selectedYear
-        }));
+    }));
 
     await ctx.editMessageReplyMarkup({
         reply_markup: resultInlineKeyboard,
@@ -617,7 +627,7 @@ async function askForBirthdayYear(
 
 
 async function askForBirthdayMonth(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext,
     year: string
 ): Promise<string> {
@@ -652,7 +662,7 @@ async function askForBirthdayMonth(
     const resultInlineKeyboard = new InlineKeyboard();
     resultInlineKeyboard.text(ctx.t('birthday-month-selected', {
         "month": selectedMonth.split('_')[1]
-        }));
+    }));
 
     await ctx.editMessageReplyMarkup({
         reply_markup: resultInlineKeyboard,
@@ -664,7 +674,7 @@ async function askForBirthdayMonth(
 };
 
 async function askForBirthdayDay(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext,
     year: string,
     month: string
@@ -673,7 +683,7 @@ async function askForBirthdayDay(
 
     // Send the first message with the inline keyboard
     const { inlineKeyboard, dayValues } = inlineBirthdayDayKeyboardButtons(ctx, year, month.split('_')[0]);
-    
+
     // Demande à l'utilisateur sa décennie.
     const message = await ctx.reply(ctx.t('profile-ask-for-day'), {
         reply_markup: inlineKeyboard,
@@ -699,7 +709,7 @@ async function askForBirthdayDay(
     const resultInlineKeyboard = new InlineKeyboard();
     resultInlineKeyboard.text(ctx.t('birthday-day-selected', {
         "day": selectedDay
-        }));
+    }));
 
     await ctx.editMessageReplyMarkup({
         reply_markup: resultInlineKeyboard,
@@ -712,7 +722,7 @@ async function askForBirthdayDay(
 
 // Function that asks for user age
 async function askForAge(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext,
     g: Gender
 ): Promise<number | undefined> {
@@ -724,7 +734,7 @@ async function askForAge(
     do {
         // Attend la réponse de l'utilisateur.
         age = await conversation.form.int({
-            otherwise:  async (ctx: CustomContext) => {
+            otherwise: async (ctx: CustomContext) => {
                 if (!ctx.message?.text?.startsWith('/'))
                     await ctx.reply(ctx.t('profile-expected-number-error'));
             }
@@ -732,13 +742,13 @@ async function askForAge(
         if (age < 18) {
             await ctx.reply(ctx.t('profile-age-minor-error', {
                 "delai": 18 - age
-                }),
-                {parse_mode: "HTML"}
+            }),
+                { parse_mode: "HTML" }
             );
             return;
         } else if (age > 99)
             await ctx.reply(ctx.t('profile-age-senior-error', { "age": age }));
-        
+
         await conversation.log("age: " + age);
     } while (age < 18 || age > 99);
 
@@ -748,16 +758,16 @@ async function askForAge(
 
 // Define the function to ask for the municipality (Commune)
 async function askForMunicipality(
-    conversation: MyConversation, 
-    ctx: CustomContext, 
+    conversation: MyConversation,
+    ctx: CustomContext,
     promptPostalCode: string
-): Promise<{postal_code_text: string, chosenCommune: Commune}> {
+): Promise<{ postal_code_text: string, chosenCommune: Commune }> {
     await ctx.reply(ctx.t(promptPostalCode));
 
     let postalCode = 0;
     let postal_code_text: string = "";
     let communes: Commune[] = [];
-    
+
     // Get a valid postal code and associated communes
     do {
         postalCode = await conversation.form.int({
@@ -812,15 +822,15 @@ async function askForMunicipality(
                 await handleInvalidUserInput(ctx);
             }
         });
-        
+
         chosenCommune = communes[Number(resMunicipality.callbackQuery.data)];
 
         // Clear the inline keyboard and show the selected street type
         const resultInlineKeyboard = new InlineKeyboard();
         resultInlineKeyboard.text(ctx.t('trip-chosen-municipality', {
-                "municipality": chosenCommune.nom_commune_complet,
-                "postal_code": chosenCommune.code_postal
-            })
+            "municipality": chosenCommune.nom_commune_complet,
+            "postal_code": chosenCommune.code_postal
+        })
             , 'void');
 
         await ctx.editMessageReplyMarkup({
@@ -830,26 +840,25 @@ async function askForMunicipality(
         });
     }
 
-    return {postal_code_text, chosenCommune}; // Return the chosen municipality
+    return { postal_code_text, chosenCommune }; // Return the chosen municipality
 }
 
 // Define the function to ask for a street type
 async function askForProfileMenu(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext, p: Profile
-): Promise<string | undefined>
-{
+): Promise<string | undefined> {
     const hasPhotos: boolean = (p.photos !== undefined && p.photos.length > 0);
     const hasBio: boolean = p.bio !== undefined;
 
-    let selectedAction: string| undefined = undefined;
+    let selectedAction: string | undefined = undefined;
 
     // Send the first message with the inline keyboard
     const { inlineKeyboard, profileMenuValues } = inlineProfileMenuKeyboardButtons(ctx, hasPhotos, hasBio);
-    
+
     //await displayProfileMenu(ctx, p, inlineKeyboard);
     await p.display(ctx, inlineKeyboard);
-    
+
     // await ctx.reply(ctx.t(prompt), {
     //     reply_markup: inlineKeyboard,
     // });  
@@ -868,15 +877,14 @@ async function askForProfileMenu(
 }
 
 async function confirmPhotoProfile(
-    conversation: MyConversation, 
-    ctx: CustomContext): Promise<boolean> 
-{
+    conversation: MyConversation,
+    ctx: CustomContext): Promise<boolean> {
     await conversation.log("Inside confirmPhotoProfile conversation");
     // Demande à l'utilisateur s'il souhaite charger une photo de profile.
     await ctx.reply(ctx.t('profile-photo-upload-confirmation'), {
         reply_markup: inlineYesNoKeyboardButtons(ctx),
     });
-    
+
     // Attend la réponse de l'utilisateur.
     const photoRes = await conversation.waitForCallbackQuery(["y", "n"], {
         otherwise: async (ctx: CustomContext) => {
@@ -884,15 +892,14 @@ async function confirmPhotoProfile(
         }
     });
     const confirmPhoto = photoRes.callbackQuery.data.match(/y/i) ? true : false;
-    
+
     return confirmPhoto;
 }
 
 async function doBio(
-    conversation: MyConversation, 
+    conversation: MyConversation,
     ctx: CustomContext,
-    profile?:Profile): Promise<string | undefined> 
-{
+    profile?: Profile): Promise<string | undefined> {
     await conversation.log("Inside doBio conversation");
     if (profile && profile.bio)
         await ctx.reply(ctx.t('profile-modify-bio'));
@@ -903,7 +910,7 @@ async function doBio(
     const bio = await conversation.waitFor(":text");
 
     const receivedText = bio.msg.text?.replace(/^\//, '');
-    if (receivedText && commandTranslations.skip.includes(receivedText)) {
+    if (receivedText && flowCommandTranslations.skip.includes(receivedText)) {
         return;
     }
 
@@ -911,20 +918,19 @@ async function doBio(
 }
 
 async function doPhotoProfile(
-    conversation: MyConversation, 
-    ctx: CustomContext): Promise<Photo[] | undefined> 
-{
+    conversation: MyConversation,
+    ctx: CustomContext): Promise<Photo[] | undefined> {
     await conversation.log("Inside doPhotoProfile conversation");
     // Demande à l'utilisateur s'il souhaite charger une photo de profile.
-   
+
     let isPhoto = false;
-    
+
     const photoProfile: Photo[] = [];
 
     do {
         await ctx.reply(ctx.t('profile-photo-upload-confirmation-yes'));
         const photoCtx = await conversation.wait();
-        
+
         if (photoCtx.message?.photo) {
             isPhoto = true;
             await conversation.log("Photo reçue!");
@@ -941,7 +947,7 @@ async function doPhotoProfile(
             });
         }
         const receivedText = photoCtx.message?.text?.replace(/^\//, '');
-        if (receivedText && commandTranslations.skip.includes(receivedText)) {
+        if (receivedText && flowCommandTranslations.skip.includes(receivedText)) {
             return;
         }
     } while (!isPhoto);
@@ -951,24 +957,23 @@ async function doPhotoProfile(
 
 export async function confirmDeletePhotoProfile(
     conversation: MyConversation,
-    ctx: CustomContext): Promise<boolean | undefined>
-{
+    ctx: CustomContext): Promise<boolean | undefined> {
     await conversation.log("Inside confirmDeletePhotoProfile conversation");
 
-    const userId = ctx.from?ctx.from.id:'undefined';
+    const userId = ctx.from ? ctx.from.id : 'undefined';
     if (!userId) {
         await conversation.log("userId is undefined");
         await ctx.reply(ctx.t('userId-undefined'));
         return;
     }
-    
+
     // Demande à l'utilisateur confirmation de suppression.
     await ctx.reply(ctx.t('profile-photo-delete-confirmation'), {
         reply_markup: inlineYesNoKeyboardButtons(ctx),
     });
-    
-     // Attend la réponse de l'utilisateur.
-    const result = await conversation.waitForCallbackQuery(["y", "n"],{
+
+    // Attend la réponse de l'utilisateur.
+    const result = await conversation.waitForCallbackQuery(["y", "n"], {
         otherwise: async (ctx: CustomContext) => {
             await handleInvalidUserInput(ctx);
         }
@@ -979,13 +984,12 @@ export async function confirmDeletePhotoProfile(
 
 /** Defines "deleteProfile" conversation */
 export async function confirmDeleteProfile(
-    conversation: MyConversation, 
-    ctx: CustomContext): Promise<boolean | undefined>
-{
+    conversation: MyConversation,
+    ctx: CustomContext): Promise<boolean | undefined> {
     await conversation.log("Inside confirmDeleteProfile");
     await conversation.log("Profil à supprimer pour userId: " + ctx.from!.id!);
-    
-    const userId = ctx.from?ctx.from.id:'undefined';
+
+    const userId = ctx.from ? ctx.from.id : 'undefined';
     if (!userId) {
         await conversation.log("userId is undefined");
         await ctx.reply(ctx.t('userId-undefined'));
@@ -993,20 +997,20 @@ export async function confirmDeleteProfile(
     }
 
     await conversation.log("userId: " + userId);
-    
+
     // Demande à l'utilisateur confirmation de suppression.
     await ctx.reply(ctx.t('profile-delete-confirmation'), {
         reply_markup: inlineYesNoKeyboardButtons(ctx),
         parse_mode: "HTML"
     });
-    
-     // Attend la réponse de l'utilisateur.
-    const result = await conversation.waitForCallbackQuery(["y", "n"],{
+
+    // Attend la réponse de l'utilisateur.
+    const result = await conversation.waitForCallbackQuery(["y", "n"], {
         otherwise: async (ctx: CustomContext) => {
-            await handleInvalidUserInput(ctx);    
+            await handleInvalidUserInput(ctx);
         }
     });
     const confirmation = result.callbackQuery.data.match(/y/i) ? true : false;
-    
+
     return confirmation;
 }

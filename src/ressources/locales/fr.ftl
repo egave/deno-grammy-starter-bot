@@ -37,7 +37,7 @@ help =
   {-cmd-help} : affiche ce message d'aide
   {-cmd-cgu} : permet de lire et acceter/refuser les CGUs
   {-cmd-profile} : permet de créer/modifier/supprimer ton profil
-  {-cmd-cancel} : annule une conversation en cours avec le Bot
+  {-cmd-quit} : termine une conversation en cours avec le Bot
   
 info =
   Nom du Bot : {-project-name}
@@ -60,7 +60,7 @@ info-light =
   chat-id: {$chat-id}
   chat-type: {$chat-type}
 
-cancel =
+quit =
   Annulation effectuée !
 
 not-found-message =
@@ -198,8 +198,8 @@ profile-view =
   <blockquote><b>{$title}</b></blockquote>
 
   { $gender ->
-    [Man] <tg-emoji emoji-id="5368324170671202286">🙋‍♂️ </tg-emoji><strong>{$contact}</strong>{$age} 
-    [Woman] <tg-emoji emoji-id="5368324170671202286">🙋‍♀️ </tg-emoji><strong>{$contact}</strong>{$age}
+    [Man] <tg-emoji emoji-id="5368324170671202286">🙋‍♂️</tg-emoji><strong>{$contact}</strong>{$age} 
+    [Woman] <tg-emoji emoji-id="5368324170671202286">🙋‍♀️</tg-emoji><strong>{$contact}</strong>{$age}
     *[other]
       <strong>{$contact}</strong>{$age}
   }

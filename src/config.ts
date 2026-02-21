@@ -1,6 +1,6 @@
-export const VERSION = "V2.1"
-export const VERSION_DATE = "02-08-2025" 
-export const VERSION_NOTES = "Version V2.1-bêta de DenoGrammyStarter Bot" 
+export const VERSION = "V2.2"
+export const VERSION_DATE = "21-02-2026"
+export const VERSION_NOTES = "Version V2.2 de DenoGrammyStarter Bot"
 export const BOT_USERNAME = "@DenoGrammyStarter_bot";
 export const DEV_USERNAME = "@Enguerrand94"
 
@@ -25,7 +25,7 @@ export enum KVKeyNames {
 }
 
 // Define the KV KEYS that have numeric values as part 2
-export const KEY_AS_NUMBER = [KVKeyNames.BOT_STATUS, KVKeyNames.CGU, KVKeyNames.ERROR_LOGS_BY_USER, KVKeyNames.PROFILES, /*KVKeyNames.SESSIONS,*/]; 
+export const KEY_AS_NUMBER = [KVKeyNames.BOT_STATUS, KVKeyNames.CGU, KVKeyNames.ERROR_LOGS_BY_USER, KVKeyNames.PROFILES, /*KVKeyNames.SESSIONS,*/];
 
 export const DEFAULTS = {
     KV: {
@@ -34,14 +34,14 @@ export const DEFAULTS = {
         MAX_WAIT_RETRY_DELAY: 50, // Max delay in milliseconds between retries
         EXPIRE_IN: 180 * 24 * 60 * 60 * 1000, // Global kv Key expiration time in milliseconds (180 days)
         GET_MANY_BATCH_SIZE: 10, // Maximum number of keys to fetch in a single batch
-    },  
+    },
     CONFIG: {
         LANGUAGE: {
             LANGUAGE_TAG: "fr-FR",
             TIMEZONE: "Europe/Paris"
         },
         CONVERSATION: {
-            COMMON_OPTIONS: { 
+            COMMON_OPTIONS: {
                 maxMillisecondsToWait: 60 * 60 * 1000,
                 parallel: true
             },
@@ -49,7 +49,8 @@ export const DEFAULTS = {
                 MIN_LENGTH: 100, // Minimum number of characters for a comment
                 MAX_LENGTH: 1000, // Maximum number of characters for a comment
             }
-        }
+        },
+        MESSAGE_DELETE_DELAY: 6000  // Delay in milliseconds for deleting messages
     },
     CGU: {
         NUMBER_TEXTS: 1
@@ -65,37 +66,45 @@ export const DEFAULTS = {
 export const BLOQUED = 'kicked';
 export const MEMBER = 'member';
 
-export const commandTranslations = {
-    version : [
+export const globalCommandTranslations = {
+    version: [
         'version'
     ],
-    start : [
+    start: [
         'start', 'demarrer', 'empezar'
     ],
-    help : [
+    help: [
         'help', 'aide', 'ayuda'
     ],
-    terms : [
+    terms: [
         'terms', 'cgu', 'cgu'
     ],
-    profile : [
+    profile: [
         'profile', 'profil', 'perfil'
     ],
-    stats : [
-      'stat', 'stats', 'statistics'
+    stats: [
+        'stat', 'stats', 'statistics'
     ],
-    cancel : [
+    quit: [
+        'quit', 'quitter', 'salir'
+    ]
+};
+
+export const flowCommandTranslations = {
+    cancel: [
         'cancel', 'annuler', 'anular'
-      ],
-    back : [
-        'back', 'retour', 'vuelta'
-      ],
-    quit : [
-      'quit', 'quitter', 'salir'
     ],
-    skip : [
+    back: [
+        'back', 'retour', 'vuelta'
+    ],
+    skip: [
         'skip', 'passer', 'saltar'
-      ]
-  };
+    ]
+};
+
+export const commandTranslations = {
+    ...globalCommandTranslations,
+    ...flowCommandTranslations
+};
 
 export const adminCommands = ['info', 'cmds', 'flyer', 'map', 'logctx', 'delctx', 'mig', 'ls', 'kv', 'lv', 'lvs', 'sd', 'ds', 'delkeys', 'add', 'ddd'];

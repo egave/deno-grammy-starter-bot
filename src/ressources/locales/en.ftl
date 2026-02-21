@@ -8,9 +8,9 @@
 -cmd-help = /help
 -cmd-cgu = /terms
 -cmd-profile = /profile
+-cmd-quit = /quit
 -cmd-cancel = /cancel
 -cmd-back = /back
--cmd-quit = /quit
 -cmd-skip = /skip
 
 ## Commands
@@ -37,7 +37,7 @@ help =
   {-cmd-help}: show this help message
   {-cmd-cgu}: allows you to read and accept/decline the Terms of Use
   {-cmd-profile}: allows you to create/modify/delete your profile
-  {-cmd-cancel}: cancels an ongoing conversation with the Bot
+  {-cmd-quit}: ends the conversation with the Bot
   
 info =
   Bot Name: {-project-name}
@@ -60,7 +60,7 @@ info-light =
   chat-id: {$chat-id}
   chat-type: {$chat-type}
 
-cancel =
+quit =
   Cancellation completed!
 
 not-found-message =
@@ -198,8 +198,8 @@ profile-view =
   <blockquote><b>{$title}</b></blockquote>
 
   { $gender ->
-    [Man] <tg-emoji emoji-id="5368324170671202286">🙋‍♂️ </tg-emoji><strong>{$contact}</strong>{$age} 
-    [Woman] <tg-emoji emoji-id="5368324170671202286">🙋‍♀️ </tg-emoji><strong>{$contact}</strong>{$age}
+    [Man] <tg-emoji emoji-id="5368324170671202286">🙋‍♂️</tg-emoji><strong>{$contact}</strong>{$age} 
+    [Woman] <tg-emoji emoji-id="5368324170671202286">🙋‍♀️</tg-emoji><strong>{$contact}</strong>{$age}
     *[other]
       <strong>{$contact}</strong>{$age}
   }
